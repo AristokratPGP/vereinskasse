@@ -1,44 +1,64 @@
 import tkinter as tk
 from tkinter import messagebox
-from login_backend import load_users
+import csv
+import subprocess  # Für das Starten der Admin-GUI
 
+
+# Benutzer aus CSV-Datei laden
+def load_users():
+    users = {}
+    try:
+        with open("users.csv", mode="r", encoding="utf-8") as file:
+            reader = csv.reader(file)
+            next(reader)  # Überspringe die Kopfzeile
+            for row in reader:
+                username, password, role = row
+                users[username] = {"password": password, "role": role}
+    except FileNotFoundError:
+        messagebox.showerror("Fehler", "Benutzerdaten nicht gefunden!")
+    return users
+
+
+# Login-Funktion
 def login():
     username = entry_username.get()
     password = entry_password.get()
-    
     users = load_users()
-    
-    print(f"Eingegebene Login-Daten: Benutzername={username}, Passwort={password}")
-    
-    if username in users and users[username].password == password:
-        messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}! Rolle: {users[username].role}")
-        print("Login erfolgreich für Benutzer:", username)
+
+    if username in users and users[username]["password"] == password:
+        role = users[username]["role"]
+        messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}!\nRolle: {role}")
+        root.destroy()  # Schließt das Login-Fenster
+
+        # 💡 Öffne die passende GUI nach erfolgreichem Login
+        if role == "Administrator":
+            subprocess.Popen(["python", "admin_gui.py"], shell=True)  # Startet das Admin-Dashboard
+        elif role == "Kassenwart":
+            subprocess.Popen(["python", "kassenwart_gui.py"], shell=True)
+        elif role == "Referent-Finanzen":
+            subprocess.Popen(["python", "finanzen_gui.py"], shell=True)
+        else:
+            messagebox.showerror("Fehler", "Unbekannte Rolle!")
     else:
-        messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort")
-        print("Login fehlgeschlagen für Benutzer:", username)
+        messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
 
-def create_login_gui():
-    global entry_username, entry_password
-    
-    root = tk.Tk()
-    root.title("Vereinskassen-System Login")
-    root.geometry("300x200")
-    
-    tk.Label(root, text="Benutzername:").pack(pady=5)
-    entry_username = tk.Entry(root)
-    entry_username.pack(pady=5)
-    
-    tk.Label(root, text="Passwort:").pack(pady=5)
-    entry_password = tk.Entry(root, show="*")
-    entry_password.pack(pady=5)
-    
-    tk.Button(root, text="Login", command=login).pack(pady=20)
-    
-    root.mainloop()
 
-if __name__ == "__main__":
-    create_login_gui()
+# GUI erstellen
+root = tk.Tk()
+root.title("Login - Vereinskassen-System")
+root.geometry("300x200")
 
+tk.Label(root, text="Benutzername:").pack(pady=5)
+entry_username = tk.Entry(root)
+entry_username.pack(pady=5)
+
+tk.Label(root, text="Passwort:").pack(pady=5)
+entry_password = tk.Entry(root, show="*")
+entry_password.pack(pady=5)
+
+tk.Button(root, text="Login", command=login).pack(pady=20)
+
+root.mainloop()
 
 
 
