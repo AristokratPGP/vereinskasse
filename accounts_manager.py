@@ -27,7 +27,7 @@ class Transaktion:
 
     def __init__(self, konto: str, typ: str, betrag: float, quelle: str, notiz: str = "", zielkonto: str = None):
         self.konto = konto
-        self.typ = typ  # Einzahlung, Auszahlung, Umbuchung
+        self.typ = typ
         self.betrag = betrag
         self.quelle = quelle
         self.notiz = notiz
@@ -134,6 +134,15 @@ class AccountManager:
         self.save_data()
         return {"success": f"{amount}€ von '{name}' ausgezahlt.", "transaction": transaction}
 
+    def get_transaction_history(self, name: str) -> List[Dict]:
+        """Gibt die Transaktionshistorie eines Kontos zurück."""
+        print(f"[DEBUG] Lade Transaktionshistorie für Konto: {name}")
+
+        if name not in self.data["konten"]:
+            return {"error": f"Konto '{name}' existiert nicht."}
+
+        return self.data["konten"][name]["transaktionen"]
+
     def transfer(self, from_account: str, to_account: str, amount: float, notiz: str = "") -> Dict:
         """Überweist Geld zwischen zwei Konten."""
         print(f"[DEBUG] Überweisung: {amount}€ von '{from_account}' nach '{to_account}'")
@@ -171,5 +180,7 @@ def main():
 
     print(manager.delete_account("Tanzen"))
 
+
 if __name__ == "__main__":
     main()
+
