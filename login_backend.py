@@ -1,8 +1,9 @@
 import csv
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
 
-CSV_FILE = "users.csv"
+CSV_FILE = os.path.join(os.path.dirname(__file__), "users.csv")
 
 class User:
     def __init__(self, username, password, role):
