@@ -16,21 +16,48 @@
             ]
         }
     },
+  
     "users": {
         "Hans": {
             "passwort": "hans123",
             "rolle": "Kassenwart",
-            "konten": ["Basketball"]  // Hans hat Zugriff auf das Basketball-Konto
+            "konten": ["Basketball"] 
         },
         "Lisa": {
             "passwort": "lisa456",
             "rolle": "Referent-Finanzen",
-            "konten": []  // Zugriff auf alle Konten
+            "konten": []
         },
         "Admin": {
             "passwort": "admin789",
             "rolle": "Administrator",
-            "konten": []  // Zugriff auf alle Konten
+            "konten": []
         }
-    }
+    },
+    "Referent-Finanzen": [
+        {
+            "Benutzername": "Finanzen",
+            "Passwort": "finanzen789"
+        }
+    ],
+    "Kassenwart": {
+        "Tanzen": [
+            {
+                "Benutzername": "KassenwartHans",
+                "Passwort": "Hans"
+            }
+        ],
+        "basketball": [
+            {
+                "Benutzername": "KassenwartDieter",
+                "Passwort": "Dieter"
+            }
+        ]
+    },
+    "Administrator": [
+        {
+            "Benutzername": "Admin",
+            "Passwort": "admin123"
+        }
+    ]
 }
