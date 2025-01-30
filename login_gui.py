@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from vereinskasse.login_backend import load_users, hash_password
+from login_backend import load_users, hash_password
 
 def login():
     username = entry_username.get()
