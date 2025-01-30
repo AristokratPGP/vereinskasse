@@ -1,0 +1,22 @@
+{
+    "Referent-Finanzen": [
+        {
+            "Benutzername": "Finanzen",
+            "Passwort": "finanzen789"
+        }
+    ],
+    "Kassenwart": {
+        "Tanzen": [
+            {
+                "Benutzername": "Kassenwart",
+                "Passwort": "kasse456"
+            }
+        ]
+    },
+    "Administrator": [
+        {
+            "Benutzername": "Admin",
+            "Passwort": "admin123"
+        }
+    ]
+}

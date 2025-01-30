@@ -20,37 +20,46 @@ PYTHON_CMD = "python" if IS_WINDOWS else "python3"
 def login():
     username = entry_username.get()
     password = entry_password.get()
-    users = UserManager.load_users()
+    manager = UserManager() 
+    users = manager.load_users()
 
-    print(f"Eingegebene Login-Daten: Benutzername={username}, Passwort={password}")
+    # Benutzer in der JSON-Struktur suchen
+    role, bereich = None, None
+    user_found = None
 
-    if username in users and users[username].password == password:
-        role = users[username].role
-        messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}!\nRolle: {role}")
+    for r, user_list in users.items():
+        if r == "Kassenwart":  # Kassenwarte haben eine weitere Hierarchie
+            for b, kassenwarte in user_list.items():
+                for user in kassenwarte:
+                    if user["Benutzername"] == username and user["Passwort"] == password:
+                        role, bereich, user_found = r, b, user
+                        break
+        else:  # Für Administratoren und Referent-Finanzen
+            for user in user_list:
+                if user["Benutzername"] == username and user["Passwort"] == password:
+                    role, user_found = r, user
+                    break
+
+    if user_found:
+        message = f"Willkommen, {username}!\nRolle: {role}"
+        if bereich:
+            message += f"\nBereich: {bereich}"  # Bereich anzeigen, falls Kassenwart
+
+        messagebox.showinfo("Login Erfolgreich", message)
         root.destroy()  # Schließt das Login-Fenster
-
-        print(f"Basisverzeichnis: {BASE_DIR}")  # Debugging
-        if not os.path.exists(ADMIN_GUI_PATH):
-            print(f"Fehler: Datei '{ADMIN_GUI_PATH}' wurde nicht gefunden.")
-            return
 
         def start_gui(script_path):
             """Startet das jeweilige GUI-Skript mit der passenden Methode für Windows oder macOS/Linux"""
             if IS_WINDOWS:
-                print(f"Starte {script_path} unter Windows...")
                 subprocess.Popen([PYTHON_CMD, script_path], shell=True)  # Windows mit shell=True
             else:
-                print(f"Starte {script_path} unter macOS/Linux...")
                 subprocess.Popen([PYTHON_CMD, script_path])  # macOS/Linux ohne shell
 
         if role == "Administrator":
-            print("Administrator-Login erkannt. Starte Admin-GUI...")
             start_gui(ADMIN_GUI_PATH)
         elif role == "Kassenwart":
-            print("Kassenwart-Login erkannt. Starte Kassenwart-GUI...")
             start_gui(KASSENWART_GUI_PATH)
         elif role == "Referent-Finanzen":
-            print("Referent-Finanzen-Login erkannt. Starte Finanzen-GUI...")
             start_gui(FINANZEN_GUI_PATH)
     else:
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")

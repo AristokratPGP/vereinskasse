@@ -1,90 +1,156 @@
-import csv
+import json
 import os
 
-class User:
-    def __init__(self, username, password, role):
-        self.username = username
-        self.password = password
-        self.role = role
-
-    def to_list(self):
-        """Konvertiert das User-Objekt in eine Liste für CSV."""
-        return [self.username, self.password, self.role]
-
-
 class UserManager:
-    CSV_FILE = os.path.join(os.path.dirname(__file__), "users.csv")
-    HEADER = ["Benutzername", "Passwort", "Rolle"]
+    JSON_FILE = os.path.join(os.path.dirname(__file__), "users.json")
 
     def __init__(self):
-        self.users = self.load_users() or {}
+        self.users = self.load_users() or {
+            "Referent-Finanzen": [],
+            "Kassenwart": {},
+            "Administrator": []
+        }
 
     def load_users(self):
-        """Lädt Benutzer aus der CSV-Datei. Stellt sicher, dass der Header immer vorhanden ist."""
-        users = {}
-        print("Lade Benutzer aus CSV-Datei...")
+        """Lädt Benutzer aus der JSON-Datei."""
+        print("Lade Benutzer aus JSON-Datei...")
         try:
-            with open(UserManager.CSV_FILE, mode='r', encoding='utf-8') as file:
-                reader = csv.reader(file)
-                rows = list(reader)
-
-                # Überprüfe, ob der Header existiert, ansonsten Datei korrigieren
-                if not rows or rows[0] != UserManager.HEADER:
-                    print("Fehlender oder falscher Header. Datei wird korrigiert.")
-                    self.save_users()  # Speichert mit korrektem Header
-                    return {}
-
-                # Lade Benutzer aus den weiteren Zeilen
-                for row in rows[1:]:  # Erste Zeile (Header) überspringen
-                    if len(row) == 3:
-                        username, password, role = row
-                        users[username] = User(username, password, role)
-            print("Benutzer erfolgreich geladen:", users.keys())
-        except FileNotFoundError:
-            print("Fehler: CSV-Datei nicht gefunden. Neue Datei wird erstellt.")
+            with open(UserManager.JSON_FILE, "r", encoding="utf-8") as file:
+                print("JSON geladen!")
+                return json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            print("Fehler: JSON-Datei nicht gefunden oder ungültig. Neue Datei wird erstellt.")
             self.save_users()
-        return users
+            return None
 
     def save_users(self):
-        """Speichert Benutzer in die CSV-Datei mit festem Header."""
-        with open(UserManager.CSV_FILE, "w", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow(UserManager.HEADER)  # Header schreiben
-            for user in self.users.values():
-                writer.writerow(user.to_list())
+        """Speichert Benutzer in die JSON-Datei."""
+        with open(UserManager.JSON_FILE, "w", encoding="utf-8") as file:
+            json.dump(self.users, file, indent=4, ensure_ascii=False)
 
-    def add_user(self, username, password, role):
-        if username in self.users:
-            return "Fehler: Benutzer existiert bereits."
-        self.users[username] = User(username, password, role)
+    def add_user(self, username, password, role, bereich=None):
+        """Fügt einen neuen Benutzer hinzu, abhängig von der Rolle. Erlaubt nur gültige Rollen."""
+        VALID_ROLES = ["Referent-Finanzen", "Kassenwart", "Administrator"]
+
+        if role not in VALID_ROLES:
+            return f"Fehler: Ungültige Rolle '{role}'. Erlaubte Rollen: {', '.join(VALID_ROLES)}."
+
+        if role == "Kassenwart":
+            if not bereich:
+                return "Fehler: Bereich muss für Kassenwart angegeben werden."
+            if bereich not in self.users["Kassenwart"]:
+                self.users["Kassenwart"][bereich] = []
+            self.users["Kassenwart"][bereich].append({"Benutzername": username, "Passwort": password})
+        else:
+            if any(user["Benutzername"] == username for user in self.users[role]):
+                return "Fehler: Benutzer existiert bereits."
+            self.users[role].append({"Benutzername": username, "Passwort": password})
+
         self.save_users()
-        return f"Benutzer '{username}' mit Rolle '{role}' hinzugefügt."
+        return f"Benutzer '{username}' als '{role}' hinzugefügt."
 
-    def edit_user(self, username, new_username=None, new_password=None, new_role=None):
-        if username not in self.users:
+    def edit_user(self, username, new_username=None, new_password=None, role=None, bereich=None):
+        """Bearbeitet einen Benutzer basierend auf Rolle und Bereich. Nur gültige Rollen erlaubt."""
+        VALID_ROLES = ["Referent-Finanzen", "Kassenwart", "Administrator"]
+
+        # Automatische Erkennung der aktuellen Rolle und Bereich
+        detected_role, detected_bereich = self.find_user_role_and_area(username)
+
+        if detected_role is None:
             return "Fehler: Benutzer nicht gefunden."
 
-        user = self.users.pop(username)
-        new_username = new_username or user.username
-        new_password = new_password or user.password
-        new_role = new_role or user.role
+        # Falls keine neue Rolle angegeben wurde, bleibt die alte erhalten
+        role = role or detected_role
+        bereich = bereich or detected_bereich  # Bereich bleibt erhalten, außer neue Rolle ist Kassenwart
 
-        self.users[new_username] = User(new_username, new_password, new_role)
-        self.save_users()
-        return f"Benutzer aktualisiert: {new_username}, Rolle: {new_role}"
+        # Sicherstellen, dass die neue Rolle gültig ist
+        if role not in VALID_ROLES:
+            return f"Fehler: Ungültige Rolle '{role}'. Erlaubte Rollen: {', '.join(VALID_ROLES)}."
+
+        # Wenn die Rolle sich zu Kassenwart ändert, muss ein Bereich gesetzt werden
+        if role == "Kassenwart" and detected_role != "Kassenwart":
+            if not bereich:
+                return "Fehler: Neuer Kassenwart benötigt einen Bereich."
+
+        # Wenn die Rolle vorher Kassenwart war, aber jetzt nicht mehr, dann Bereich entfernen
+        if detected_role == "Kassenwart" and role != "Kassenwart":
+            bereich = None  # Bereich ist nur für Kassenwarte relevant
+
+        # Bearbeitung für Kassenwart mit Bereichszuweisung
+        if role == "Kassenwart":
+            if bereich not in self.users["Kassenwart"]:
+                self.users["Kassenwart"][bereich] = []  # Falls Bereich nicht existiert, erstelle ihn
+
+            # Wenn Benutzer vorher KEIN Kassenwart war, müssen wir ihn von seiner alten Rolle entfernen
+            if detected_role != "Kassenwart":
+                self.users[detected_role] = [user for user in self.users[detected_role] if user["Benutzername"] != username]
+
+            # Benutzer zu neuem Bereich hinzufügen
+            self.users["Kassenwart"][bereich].append({
+                "Benutzername": new_username or username,
+                "Passwort": new_password or "Passwort unbekannt"
+            })
+            self.save_users()
+            return f"Benutzer '{username}' wurde zu Kassenwart im Bereich '{bereich}' geändert."
+
+        else:
+            # Bearbeitung für andere Rollen (Referent-Finanzen, Administrator)
+            for user in self.users[detected_role]:
+                if user["Benutzername"] == username:
+                    user["Benutzername"] = new_username or user["Benutzername"]
+                    user["Passwort"] = new_password or user["Passwort"]
+                    self.save_users()
+                    return f"Benutzer '{username}' wurde als '{role}' aktualisiert."
+
+        return "Fehler: Benutzer nicht gefunden."
+
+    def find_user_role_and_area(self, username):
+        """Findet die Rolle und den Bereich eines Benutzers automatisch."""
+        for role, users in self.users.items():
+            if role == "Kassenwart":
+                for bereich, kassenwarte in users.items():
+                    for user in kassenwarte:
+                        if user["Benutzername"] == username:
+                            return role, bereich  # Gefunden als Kassenwart mit Bereich
+            else:
+                for user in users:
+                    if user["Benutzername"] == username:
+                        return role, None  # Gefunden, aber kein Bereich nötig
+
+        return None, None  # Benutzer nicht gefunden
 
     def delete_user(self, username):
-        if username not in self.users:
+        """Löscht einen Benutzer, indem die Rolle und ggf. der Bereich automatisch erkannt wird."""
+        role, bereich = self.find_user_role_and_area(username)
+
+        if role is None:
             return "Fehler: Benutzer nicht gefunden."
-        
-        del self.users[username]
+
+        if role == "Kassenwart":
+            self.users["Kassenwart"][bereich] = [
+                user for user in self.users["Kassenwart"][bereich] if user["Benutzername"] != username
+            ]
+            # Falls der Bereich leer ist, lösche den Bereich aus der Struktur
+            if not self.users["Kassenwart"][bereich]:
+                del self.users["Kassenwart"][bereich]
+        else:
+            self.users[role] = [user for user in self.users[role] if user["Benutzername"] != username]
+
         self.save_users()
         return f"Benutzer '{username}' gelöscht."
 
     def list_users(self):
-        if not self.users:
-            return "Keine Benutzer vorhanden."
-        return "\n".join([f"{user}: {info.role}" for user, info in self.users.items()])
+        """Listet alle Benutzer auf."""
+        output = []
+        for role, users in self.users.items():
+            if role == "Kassenwart":
+                for bereich, kassenwarte in users.items():
+                    for user in kassenwarte:
+                        output.append(f"{user['Benutzername']} (Kassenwart - {bereich})")
+            else:
+                for user in users:
+                    output.append(f"{user['Benutzername']} ({role})")
+        return "\n".join(output) if output else "Keine Benutzer vorhanden."
 
 
 def main():
@@ -102,15 +168,37 @@ def main():
         if choice == "1":
             username = input("Benutzername: ").strip()
             password = input("Passwort: ").strip()
-            role = input("Rolle: ").strip()
-            print(manager.add_user(username, password, role))
+            role = input("Rolle (Referent-Finanzen/Kassenwart/Administrator): ").strip()
+            bereich = None
+            if role == "Kassenwart":
+                bereich = input("Bereich (z. B. Tanzen, Fußball): ").strip()
+            print(manager.add_user(username, password, role, bereich))
         
         elif choice == "2":
             username = input("Welcher Benutzer soll geändert werden? ").strip()
-            new_username = input("Neuer Benutzername (leer lassen für keine Änderung): ").strip() or None
-            new_password = input("Neues Passwort (leer lassen für keine Änderung): ").strip() or None
-            new_role = input("Neue Rolle (leer lassen für keine Änderung): ").strip() or None
-            print(manager.edit_user(username, new_username, new_password, new_role))
+
+            # Automatische Erkennung von Rolle und Bereich
+            detected_role, detected_bereich = manager.find_user_role_and_area(username)
+
+            if detected_role is None:
+                print("Fehler: Benutzer nicht gefunden.")
+            else:
+                print(f"Aktuelle Rolle: {detected_role}")
+                if detected_bereich:
+                    print(f"Aktueller Bereich: {detected_bereich}")
+
+                new_username = input("Neuer Benutzername (leer lassen für keine Änderung): ").strip() or None
+                new_password = input("Neues Passwort (leer lassen für keine Änderung): ").strip() or None
+
+                # Neue Rolle setzen, aber wenn leer bleibt die alte
+                new_role = input("Neue Rolle (leer lassen für keine Änderung): ").strip() or detected_role
+
+                # Falls die neue Rolle Kassenwart ist, kann der Bereich geändert werden
+                new_bereich = None
+                if new_role == "Kassenwart":
+                    new_bereich = input("Neuer Bereich (leer lassen für aktuellen Bereich): ").strip() or detected_bereich
+
+                print(manager.edit_user(username, new_username, new_password, new_role, new_bereich))
         
         elif choice == "3":
             username = input("Welchen Benutzer löschen? ").strip()
