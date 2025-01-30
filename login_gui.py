@@ -4,19 +4,6 @@ import csv
 import subprocess  # Für das Starten der Admin-GUI
 
 
-# Benutzer aus CSV-Datei laden
-def load_users():
-    users = {}
-    try:
-        with open("users.csv", mode="r", encoding="utf-8") as file:
-            reader = csv.reader(file)
-            next(reader)  # Überspringe die Kopfzeile
-            for row in reader:
-                username, password, role = row
-                users[username] = {"password": password, "role": role}
-    except FileNotFoundError:
-        messagebox.showerror("Fehler", "Benutzerdaten nicht gefunden!")
-    return users
 
 
 # Login-Funktion
