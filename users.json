@@ -34,32 +34,3 @@
         }
     }
 }
------------------------------------------------------------
-{
-    "Referent-Finanzen": [
-        {
-            "Benutzername": "Finanzen",
-            "Passwort": "finanzen789"
-        }
-    ],
-    "Kassenwart": {
-        "Tanzen": [
-            {
-                "Benutzername": "KassenwartHans",
-                "Passwort": "Hans"
-            }
-        ],
-        "basketball": [
-            {
-                "Benutzername": "KassenwartDieter",
-                "Passwort": "Dieter"
-            }
-        ]
-    },
-    "Administrator": [
-        {
-            "Benutzername": "Admin",
-            "Passwort": "admin123"
-        }
-    ]
-}
