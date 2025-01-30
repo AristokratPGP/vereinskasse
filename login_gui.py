@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from login_backend import load_users, hash_password
+from login_backend import load_users
 
 def login():
     username = entry_username.get()
@@ -8,10 +8,14 @@ def login():
     
     users = load_users()
     
-    if username in users and users[username].password_hash == hash_password(password):
+    print(f"Eingegebene Login-Daten: Benutzername={username}, Passwort={password}")
+    
+    if username in users and users[username].password == password:
         messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}! Rolle: {users[username].role}")
+        print("Login erfolgreich für Benutzer:", username)
     else:
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort")
+        print("Login fehlgeschlagen für Benutzer:", username)
 
 def create_login_gui():
     global entry_username, entry_password
@@ -34,6 +38,7 @@ def create_login_gui():
 
 if __name__ == "__main__":
     create_login_gui()
+
 
 
 
