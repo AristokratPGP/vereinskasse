@@ -9,7 +9,7 @@ def login():
     users = load_users()
     
     if username in users and users[username].password_hash == hash_password(password):
-        messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}! Rolle: {users[username].role}")
+        messagebox.showinfo("Login -------Erfolgreich", f"Willkommen, {username}! Rolle: {users[username].role}")
     else:
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort")
 
