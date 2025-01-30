@@ -1,67 +1,85 @@
 import tkinter as tk
 from tkinter import messagebox
-import subprocess  # Für das Starten der Admin-GUI
-from user_manager import UserManager
+import subprocess
 import os
 import sys
+import json
 
 # Betriebssystem prüfen
-IS_WINDOWS = sys.platform.startswith("win")  # True, wenn Windows
+IS_WINDOWS = sys.platform.startswith("win")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Basisverzeichnis des Skripts
 ADMIN_GUI_PATH = os.path.join(BASE_DIR, "admin_gui.py")
 KASSENWART_GUI_PATH = os.path.join(BASE_DIR, "kassenwart_gui.py")
 FINANZEN_GUI_PATH = os.path.join(BASE_DIR, "finanzen_gui.py")
 
-# Wähle den richtigen Python-Befehl
-PYTHON_CMD = "python" if IS_WINDOWS else "python3"
+# JSON-Datei laden
+JSON_FILE = "data.json"
+
+def load_users():
+    """Lädt die Benutzer aus der JSON-Datei in ein Dictionary."""
+    try:
+        with open(JSON_FILE, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        # Falls "users" nicht existiert oder leer ist, gebe ein leeres Dictionary zurück
+        users = data.get("users", {})
+        print("[DEBUG] Geladene Benutzer:", users)  # Debugging-Ausgabe
+        return users
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("[DEBUG] Fehler: JSON-Datei nicht gefunden oder ungültig.")
+        return {}
 
 # Login-Funktion
 def login():
-    username = entry_username.get()
-    password = entry_password.get()
-    manager = UserManager() 
-    users = manager.load_users()
+    username = entry_username.get().strip()
+    password = entry_password.get().strip()
 
-    # Benutzer in der JSON-Struktur suchen
-    role, bereich = None, None
-    user_found = None
+    if not username or not password:
+        messagebox.showerror("Fehler", "Benutzername und Passwort eingeben!")
+        return
 
-    for r, user_list in users.items():
-        if r == "Kassenwart":  # Kassenwarte haben eine weitere Hierarchie
-            for b, kassenwarte in user_list.items():
-                for user in kassenwarte:
-                    if user["Benutzername"] == username and user["Passwort"] == password:
-                        role, bereich, user_found = r, b, user
-                        break
-        else:  # Für Administratoren und Referent-Finanzen
-            for user in user_list:
-                if user["Benutzername"] == username and user["Passwort"] == password:
-                    role, user_found = r, user
-                    break
+    users_dict = load_users()  # Lade die Benutzer aus JSON
 
-    if user_found:
-        message = f"Willkommen, {username}!\nRolle: {role}"
-        if bereich:
-            message += f"\nBereich: {bereich}"  # Bereich anzeigen, falls Kassenwart
+    print(f"[DEBUG] Benutzername eingeben: {username}")
+    print(f"[DEBUG] Passwort eingeben: {password}")
 
-        messagebox.showinfo("Login Erfolgreich", message)
-        root.destroy()  # Schließt das Login-Fenster
+    # Prüfen, ob Benutzer existiert und Passwort übereinstimmt
+    if username in users_dict:
+        print(f"[DEBUG] Gefundener Benutzer: {users_dict[username]}")  # Debugging-Ausgabe
+        print(f"[DEBUG] Erwartetes Passwort: {users_dict[username]['passwort']}")  # Erwartetes Passwort aus JSON
 
-        def start_gui(script_path):
-            """Startet das jeweilige GUI-Skript mit der passenden Methode für Windows oder macOS/Linux"""
-            if IS_WINDOWS:
-                subprocess.Popen([PYTHON_CMD, script_path], shell=True)  # Windows mit shell=True
-            else:
-                subprocess.Popen([PYTHON_CMD, script_path])  # macOS/Linux ohne shell
+        if users_dict[username]["passwort"] == password:
+            role = users_dict[username]["rolle"]
+            konten = users_dict[username]["konten"]
 
-        if role == "Administrator":
-            start_gui(ADMIN_GUI_PATH)
-        elif role == "Kassenwart":
-            start_gui(KASSENWART_GUI_PATH)
-        elif role == "Referent-Finanzen":
-            start_gui(FINANZEN_GUI_PATH)
+            message = f"Willkommen, {username}!\nRolle: {role}"
+            if konten:
+                message += f"\nZugriff auf Konten: {', '.join(konten)}"
+
+            messagebox.showinfo("Login Erfolgreich", message)
+            root.destroy()  # Schließt das Login-Fenster
+
+            def start_gui(script_path):
+                """Startet das jeweilige GUI-Skript"""
+                if IS_WINDOWS:
+                    subprocess.Popen(["python", script_path], shell=True)
+                else:
+                    subprocess.Popen(["python3", script_path])
+
+            # Richtige GUI starten
+            if role == "Administrator":
+                start_gui(ADMIN_GUI_PATH)
+            elif role == "Kassenwart":
+                start_gui(KASSENWART_GUI_PATH)
+            elif role == "Referent-Finanzen":
+                start_gui(FINANZEN_GUI_PATH)
+        else:
+            print("[DEBUG] Passwort stimmt nicht überein!")  # Debugging
+            messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
     else:
+        print("[DEBUG] Benutzer nicht gefunden!")  # Debugging
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
 
 # GUI erstellen

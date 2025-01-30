@@ -27,7 +27,7 @@ class AdminDashboard:
         self.user_window.title("Konten verwalten")
         self.user_window.geometry("500x400")
 
-        tk.Label(self.user_window, text="Benutzerverwaltung", font=("Arial", 12, "bold")).pack(pady=10)
+        tk.Label(self.user_window, text="Konten verwalten", font=("Arial", 12, "bold")).pack(pady=10)
 
         self.content_frame = tk.Frame(self.user_window)
         self.content_frame.pack(pady=10, fill="both", expand=True)
@@ -74,6 +74,18 @@ class AdminDashboard:
             messagebox.showinfo("Erfolg", f"Vereinskonto für '{name}' wurde hinzugefügt!")
             self.show_user()
 
+    def show_account(self):
+        self.clear_frame()  # Löscht alten Inhalt
+
+        tk.Label(self.content_frame, text="Liste der accounts:", font=("Arial", 10)).pack(pady=5)
+        # Beispielhafte Benutzerliste
+        if not self.users:
+            tk.Label(self.content_frame, text="Keine Benutzer vorhanden").pack()
+        else:
+            for username, details in self.users.items():
+                # Erstelle einen Text mit den Details des Benutzers
+                user_info = f"Benutzername: {username}, Rolle: {details['role']}"
+                tk.Label(self.content_frame, text=user_info).pack()
 
     def manage_users(self):
         """Öffnet ein Fenster zur Benutzerverwaltung mit dynamischem Inhalt"""
