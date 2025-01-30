@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import subprocess  # Für das Starten der Admin-GUI
-from login_backend import load_users
+from user_manager import UserManager
 import os
 import sys
 
@@ -20,7 +20,7 @@ PYTHON_CMD = "python" if IS_WINDOWS else "python3"
 def login():
     username = entry_username.get()
     password = entry_password.get()
-    users = load_users()
+    users = UserManager.load_users()
 
     print(f"Eingegebene Login-Daten: Benutzername={username}, Passwort={password}")
 

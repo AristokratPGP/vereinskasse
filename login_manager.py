@@ -1,30 +1,8 @@
-import csv
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import os
+from http.server import BaseHTTPRequestHandler
+from user_manager import UserManager
 
-CSV_FILE = os.path.join(os.path.dirname(__file__), "users.csv")
 
-class User:
-    def __init__(self, username, password, role):
-        self.username = username
-        self.password = password
-        self.role = role
-
-def load_users():
-    users = {}
-    print("Lade Benutzer aus CSV-Datei...")
-    try:
-        with open(CSV_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.reader(file)
-            next(reader)  # Header überspringen
-            for row in reader:
-                username, password, role = row
-                users[username] = User(username, password, role)
-        print("Benutzer erfolgreich geladen:", users.keys())
-    except FileNotFoundError:
-        print("Fehler: CSV-Datei nicht gefunden.")
-    return users
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -37,7 +15,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             password = data.get("password")
             print(f"Empfangene Login-Daten: Benutzername={username}, Passwort={password}")
             
-            users = load_users()
+            users = UserManager.load_users()
             
             if username in users and users[username].password == password:
                 response = {"message": "Login erfolgreich", "role": users[username].role}
