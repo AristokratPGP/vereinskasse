@@ -11,8 +11,10 @@ def login():
     password = entry_password.get()
     users = load_users()
 
-    if username in users and users[username]["password"] == password:
-        role = users[username]["role"]
+    print(f"Eingegebene Login-Daten: Benutzername={username}, Passwort={password}")
+
+    if username in users and users[username].password == password:
+        role = users[username].role
         messagebox.showinfo("Login Erfolgreich", f"Willkommen, {username}!\nRolle: {role}")
         root.destroy()  # Schließt das Login-Fenster
 
