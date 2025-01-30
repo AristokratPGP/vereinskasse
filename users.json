@@ -1,3 +1,40 @@
+
+
+{
+    "konten": {
+        "Tanzen": {
+            "saldo": 500,
+            "transaktionen": [
+                {"datum": "2025-01-01", "typ": "einzahlung", "betrag": 100},
+                {"datum": "2025-01-15", "typ": "auszahlung", "betrag": 50}
+            ]
+        },
+        "Basketball": {
+            "saldo": 300,
+            "transaktionen": [
+                {"datum": "2025-01-10", "typ": "einzahlung", "betrag": 200}
+            ]
+        }
+    },
+    "users": {
+        "Hans": {
+            "passwort": "hans123",
+            "rolle": "Kassenwart",
+            "konten": ["Basketball"]  // Hans hat Zugriff auf das Basketball-Konto
+        },
+        "Lisa": {
+            "passwort": "lisa456",
+            "rolle": "Referent-Finanzen",
+            "konten": []  // Zugriff auf alle Konten
+        },
+        "Admin": {
+            "passwort": "admin789",
+            "rolle": "Administrator",
+            "konten": []  // Zugriff auf alle Konten
+        }
+    }
+}
+-----------------------------------------------------------
 {
     "Referent-Finanzen": [
         {
@@ -8,8 +45,14 @@
     "Kassenwart": {
         "Tanzen": [
             {
-                "Benutzername": "Kassenwart",
-                "Passwort": "kasse456"
+                "Benutzername": "KassenwartHans",
+                "Passwort": "Hans"
+            }
+        ],
+        "basketball": [
+            {
+                "Benutzername": "KassenwartDieter",
+                "Passwort": "Dieter"
             }
         ]
     },
