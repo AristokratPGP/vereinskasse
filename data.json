@@ -18,7 +18,7 @@
                     "type": "Auszahlung",
                     "amount": 50,
                     "source": "Konto",
-                    "notiz": "Trikots",
+                    "note": "Trikots",
                     "zielkonto": null
                 },
                 {
@@ -33,7 +33,7 @@
             ]
         },
         "Fußball": {
-            "balance": 500,
+            "balance": 992.0,
             "transactions": [
                 {
                     "date": "2025-01-30 14:12:05",
@@ -52,11 +52,29 @@
                     "source": "Konto",
                     "note": "Trainingsmaterial",
                     "zielkonto": null
+                },
+                {
+                    "date": "2025-01-31 17:38:05",
+                    "account": "Basketball",
+                    "type": "Transfer",
+                    "amount": 112.0,
+                    "source": "Internal",
+                    "note": "vc",
+                    "target_account": "Fußball"
+                },
+                {
+                    "date": "2025-01-31 17:39:20",
+                    "account": "Fußball",
+                    "type": "Deposit",
+                    "amount": 380.0,
+                    "source": "hhhhh",
+                    "note": "t6",
+                    "target_account": null
                 }
             ]
         },
         "Basketball": {
-            "balance": 250,
+            "balance": 1199.0,
             "transactions": [
                 {
                     "date": "2025-01-28 16:20:00",
@@ -75,6 +93,42 @@
                     "source": "Konto",
                     "note": "Schachbretter",
                     "zielkonto": null
+                },
+                {
+                    "date": "2025-01-31 17:31:39",
+                    "account": "Basketball",
+                    "type": "Withdrawal",
+                    "amount": 50.0,
+                    "source": "Account",
+                    "note": "nein",
+                    "target_account": null
+                },
+                {
+                    "date": "2025-01-31 17:32:44",
+                    "account": "Basketball",
+                    "type": "Deposit",
+                    "amount": 111.0,
+                    "source": "beitrag mitglied",
+                    "note": "zu spät",
+                    "target_account": null
+                },
+                {
+                    "date": "2025-01-31 17:34:38",
+                    "account": "Basketball",
+                    "type": "Deposit",
+                    "amount": 1000.0,
+                    "source": "mitglied",
+                    "note": "d",
+                    "target_account": null
+                },
+                {
+                    "date": "2025-01-31 17:38:05",
+                    "account": "Basketball",
+                    "type": "Transfer",
+                    "amount": 112.0,
+                    "source": "Internal",
+                    "note": "vc",
+                    "target_account": "Fußball"
                 }
             ]
         }
@@ -88,7 +142,10 @@
         "Lisa": {
             "password": "lisa123",
             "role": "treasurer",
-            "accounts": ["Basketball"]
+            "accounts": [
+                "Basketball",
+                "Fußball"
+            ]
         },
         "Admin": {
             "password": "",

@@ -151,38 +151,8 @@ class UserManager:
 
         user = self.users[username]
 
-        if user.role != "Kassenwart":
+        if user.role != "treasurer":
             return {"error": "Benutzer ist kein Kassenwart."}
 
         return {"accounts": user.accounts}
 
-
-def main():
-    """Tests all functions of the UserManager."""
-    manager = UserManager()
-
-    print("\n### Adding users ###")
-    print(manager.add_user("Max", "max123", "Treasurer", []))  # Has access to all accounts
-    print(manager.add_user("Anna", "anna456", "Finance-Referent"))
-    print(manager.add_user("Tom", "tom789", "Administrator"))
-
-    print("\n### Listing all users ###")
-    print(manager.list_users())
-
-    print("\n### Editing users ###")
-    print(manager.edit_user("Max", new_password="newPassword"))
-    print(manager.edit_user("Max", new_role="Finance-Referent"))
-    print(manager.edit_user("Anna", new_accounts=["Basketball"]))  # Should have no effect
-
-    print("\n### Listing all users after edits ###")
-    print(manager.list_users())
-
-    print("\n### Deleting users ###")
-    print(manager.delete_user("Tom"))
-
-    print("\n### Listing all users after deletion ###")
-    print(manager.list_users())
-
-
-if __name__ == "__main__":
-    main()

@@ -67,13 +67,102 @@ class KassenwartDashboard:
 
         messagebox.showinfo("Einzahlung", result.get("success", result.get("error", "Fehler")))
 
+    def get_amount(self, prompt: str):
+        """Zeigt einen Dialog zur Eingabe eines Betrags und validiert die Eingabe."""
+        while True:
+            amount_str = simpledialog.askstring("Betragseingabe", prompt)
+            if amount_str is None:  # Benutzer hat Abbrechen gedrückt
+                return None
+            try:
+                amount = float(amount_str)
+                if amount > 0:
+                    return amount
+                else:
+                    messagebox.showerror("Fehler", "Der Betrag muss positiv sein!")
+            except ValueError:
+                messagebox.showerror("Fehler", "Bitte eine gültige Zahl eingeben!")
+
     def withdraw_money(self):
+        """Ermöglicht dem Kassenwart eine Auszahlung."""
         print("[DEBUG] Auszahlung wurde angeklickt.")
-        messagebox.showinfo("Auszahlung", "Funktion für Auszahlung wird implementiert.")
+
+        if not self.allowed_accounts:
+            messagebox.showerror("Fehler", "Du hast keine zugewiesenen Konten!")
+            return
+
+        account = simpledialog.askstring("Konto auswählen", "Von welchem Konto soll abgehoben werden?",
+                                         initialvalue=self.allowed_accounts[0])
+        if account not in self.allowed_accounts:
+            messagebox.showerror("Fehler", "Ungültiges Konto ausgewählt.")
+            return
+
+        amount = self.get_amount("Gib den Auszahlungsbetrag ein:")
+        if amount is None:
+            return
+
+        note = simpledialog.askstring("Notiz", "Gibt es eine Notiz zur Auszahlung?")
+
+        result = self.account_manager.withdraw(account, amount, note)
+        print(f"[DEBUG] Auszahlungsergebnis: {result}")
+
+        messagebox.showinfo("Auszahlung", result.get("success", result.get("error", "Fehler")))
 
     def transfer_money(self):
+        """Ermöglicht dem Kassenwart eine Umbuchung zwischen seinen Konten."""
         print("[DEBUG] Umbuchung wurde angeklickt.")
-        messagebox.showinfo("Umbuchung", "Funktion für Umbuchung wird implementiert.")
+
+        if len(self.allowed_accounts) < 2:
+            messagebox.showerror("Fehler", "Mindestens zwei Konten sind erforderlich für eine Umbuchung!")
+            return
+
+        from_account = simpledialog.askstring("Von Konto", "Von welchem Konto soll das Geld transferiert werden?",
+                                              initialvalue=self.allowed_accounts[0])
+        if from_account not in self.allowed_accounts:
+            messagebox.showerror("Fehler", "Ungültiges Ausgangskonto.")
+            return
+
+        to_account = simpledialog.askstring("Zielkonto", "Auf welches Konto soll das Geld transferiert werden?",
+                                            initialvalue=self.allowed_accounts[1])
+        if to_account not in self.allowed_accounts or from_account == to_account:
+            messagebox.showerror("Fehler", "Ungültiges Zielkonto.")
+            return
+
+        amount = self.get_amount("Gib den Transferbetrag ein:")
+        if amount is None:
+            return
+
+        note = simpledialog.askstring("Notiz", "Gibt es eine Notiz zur Umbuchung?")
+
+        result = self.account_manager.transfer(from_account, to_account, amount, note)
+        print(f"[DEBUG] Umbuchungsergebnis: {result}")
+
+        messagebox.showinfo("Umbuchung", result.get("success", result.get("error", "Fehler")))
+
+    def deposit_money(self):
+        """Ermöglicht dem Kassenwart eine Einzahlung auf ein bestimmtes Konto."""
+        print("[DEBUG] Einzahlung wurde angeklickt.")
+
+        if not self.allowed_accounts:
+            messagebox.showerror("Fehler", "Du hast keine zugewiesenen Konten!")
+            return
+
+        account = simpledialog.askstring("Konto auswählen", "Auf welches Konto soll eingezahlt werden?",
+                                         initialvalue=self.allowed_accounts[0])
+        if account not in self.allowed_accounts:
+            messagebox.showerror("Fehler", "Ungültiges Konto ausgewählt.")
+            return
+
+        amount = self.get_amount("Gib den Einzahlungsbetrag ein:")
+        if amount is None:
+            return
+
+        source = simpledialog.askstring("Quelle", "Woher kommt das Geld?")
+        note = simpledialog.askstring("Notiz", "Gibt es eine Notiz zur Einzahlung?")
+
+        result = self.account_manager.deposit(account, amount, source, note)
+        print(f"[DEBUG] Einzahlungsergebnis: {result}")
+
+        messagebox.showinfo("Einzahlung", result.get("success", result.get("error", "Fehler")))
 
     def show_transactions(self):
         """Zeigt die Transaktionshistorie für das Konto des Kassenwarts."""
