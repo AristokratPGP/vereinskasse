@@ -74,7 +74,7 @@
             ]
         },
         "Basketball": {
-            "balance": 1199.0,
+            "balance": 2410.0,
             "transactions": [
                 {
                     "date": "2025-01-28 16:20:00",
@@ -129,6 +129,24 @@
                     "source": "Internal",
                     "note": "vc",
                     "target_account": "Fußball"
+                },
+                {
+                    "date": "2025-01-31 21:45:56",
+                    "account": "Basketball",
+                    "type": "Deposit",
+                    "amount": 100.0,
+                    "source": "",
+                    "note": "",
+                    "target_account": null
+                },
+                {
+                    "date": "2025-01-31 22:09:21",
+                    "account": "Basketball",
+                    "type": "Deposit",
+                    "amount": 1111.0,
+                    "source": "gr",
+                    "note": "gr",
+                    "target_account": null
                 }
             ]
         }

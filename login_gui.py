@@ -7,18 +7,22 @@ from user_manager import UserManager
 from finanzen_gui import FinanzenDashboard
 from kassenwart_gui import KassenwartDashboard
 from admin_gui import AdminDashboard
-# Betriebssystem prüfen
+
+# Check operating system
 IS_WINDOWS = sys.platform.startswith("win")
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Basisverzeichnis des Skripts
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Base directory of the script
 
 
 # Login-Funktion
 def login():
+    """
+        Handles the login process and opens the appropriate GUI.
+    """
     username = entry_username.get().strip()
     password = entry_password.get().strip()
     manager = UserManager()
-    users_dict = manager.load_users()  # Lade die Benutzer aus JSON
+    users_dict = manager.load_users()  # Load users from JSON
 
     if not username or not password:
         messagebox.showerror("Fehler", "Benutzername und Passwort eingeben!")
@@ -27,10 +31,10 @@ def login():
     print(f"[DEBUG] Benutzername eingeben: {username}")
     print(f"[DEBUG] Passwort eingeben: {password}")
 
-    # Prüfen, ob Benutzer existiert und Passwort übereinstimmt
+    # Verify credentials
     if username in users_dict:
-        print(f"[DEBUG] Gefundener Benutzer: {users_dict[username]}")  # Debugging-Ausgabe
-        print(f"[DEBUG] Erwartetes Passwort: {users_dict[username].password}")  # Erwartetes Passwort aus JSON
+        print(f"[DEBUG] Gefundener Benutzer: {users_dict[username]}")  # Debugging output
+        print(f"[DEBUG] Erwartetes Passwort: {users_dict[username].password}")
 
         if users_dict[username].password == password:
             role = users_dict[username].role
@@ -42,14 +46,14 @@ def login():
 
             messagebox.showinfo("Login Erfolgreich", message)
 
-            # Verstecke das Login-Fenster anstatt es zu zerstören
+            # Hide the login window instead of destroying it
             root.withdraw()
 
-            # Richtige GUI starten
+            # Start correct GUI
             if role == "Administrator":
                 open_admin_gui()
             elif role == "Treasurer":
-                root.withdraw()  # Versteckt das Login-Fenster
+                root.withdraw()
                 open_kassenwart_gui(username)
             elif role == "Finance-Referent":
                 open_finanzen_gui()
@@ -61,28 +65,28 @@ def login():
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
 
 def open_admin_gui():
-    """Öffnet die Administrator-GUI mit dem richtigen AdminDashboard."""
-    root.withdraw()  # **Versteckt das Login-Fenster**
-    admin_window = tk.Toplevel(root)  # Neues Fenster für das Admin-Dashboard
+    """Opens the administrator GUI with the correct AdminDashboard."""
+    root.withdraw()  # Hides the login window
+    admin_window = tk.Toplevel(root)  # New window for the admin dashboard
     AdminDashboard(admin_window)
 
 def open_kassenwart_gui(username):
-    """Öffnet die Kassenwart-GUI mit dem richtigen Dashboard."""
-    kassenwart_window = tk.Toplevel(root)  # Neues Fenster
+    """Opens the cashier GUI with the correct dashboard."""
+    kassenwart_window = tk.Toplevel(root)  # new window
     KassenwartDashboard(kassenwart_window, username)
 
 def open_finanzen_gui():
-    """Öffnet die Finanz-GUI in einem neuen Fenster und übergibt die `root`-Instanz."""
+    """Opens the Finance GUI in a new window and passes the `root` instance."""
     finanzen_window = tk.Toplevel(root)
     finanzen_window.title("Vereinskassen-System - Finanzen Dashboard")
-    FinanzenDashboard(finanzen_window, root)  # `root` als Argument übergeben
+    FinanzenDashboard(finanzen_window, root)
 
 def go_back_to_login(window):
-    """Schließt ein geöffnetes Fenster und zeigt das Login-Fenster wieder an."""
+    """Closes an open window and displays the login window again."""
     window.destroy()
     root.deiconify()
 
-# GUI erstellen
+# Create GUI
 root = tk.Tk()
 root.title("Login - Vereinskassen-System")
 root.geometry("300x200")

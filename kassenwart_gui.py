@@ -2,44 +2,45 @@ __author__ = "7985984, Saghdaou, 8441241, Fischer"
 import tkinter as tk
 from tkinter import simpledialog
 from tkinter import messagebox
-import subprocess
-import os
-import sys
 from user_manager import UserManager
 from accounts_manager import AccountManager
 
 class KassenwartDashboard:
+    """
+    Dashboard for treasurers to manage club accounts.
+    """
     def __init__(self, root, username):
+        """Initializes the treasurer dashboard window."""
         self.root = root
         self.username = username
         self.user_manager = UserManager()
         self.account_manager = AccountManager()
 
-        # Lade die erlaubten Konten für den Benutzer
+        # Load the allowed accounts for the user
         self.allowed_accounts = self.user_manager.get_kassenwart_accounts(username).get("accounts", [])
         print(f"[DEBUG] Erlaubte Konten für {username}: {self.allowed_accounts}")
 
         self.root.title(f"Kassenwart - Vereinskassen-System ({username})")
         self.root.geometry("400x400")
 
-        # GUI-Elemente hinzufügen
+        # Add GUI elements
         self.render_dashboard()
 
     def render_dashboard(self):
-        """Rendert das Haupt-Dashboard der Kassenwart-GUI."""
+        """Renders the main dashboard of the cashier GUI."""
         for widget in self.root.winfo_children():
             widget.destroy()  # Lösche alle bestehenden Widgets
 
-        # Begrüßungstext
+        # Welcome text
         tk.Label(self.root, text=f"Willkommen, {self.username}!", font=("Arial", 14, "bold")).pack(pady=20)
 
-        # Wenn keine Konten verfügbar sind
+        # If no accounts are available
         if not self.allowed_accounts:
             tk.Label(self.root, text="Keine zugewiesenen Konten gefunden!", fg="red", font=("Arial", 12, "bold")).pack(pady=20)
             tk.Button(self.root, text="Zurück", command=self.logout).pack(pady=10)
             return
 
-        # Buttons für Aktionen
+        # Buttons for actions
         tk.Button(self.root, text="Einzahlung tätigen", command=self.deposit_money).pack(pady=5, fill="x")
         tk.Button(self.root, text="Auszahlung tätigen", command=self.withdraw_money).pack(pady=5, fill="x")
         tk.Button(self.root, text="Umbuchung zwischen Konten", command=self.transfer_money).pack(pady=5, fill="x")
@@ -48,13 +49,13 @@ class KassenwartDashboard:
         tk.Button(self.root, text="Beenden", command=self.root.quit).pack(pady=0)
 
     def deposit_money(self):
-        """Lässt den Kassenwart Geld auf sein Konto einzahlen."""
+        """Has the treasurer deposit money into his account."""
 
         if not self.allowed_accounts:
             messagebox.showerror("Fehler", "Du hast keine zugewiesenen Konten!")
             return
 
-        account = self.allowed_accounts[0]  # Kassenwart hat nur Zugriff auf sein Konto
+        account = self.allowed_accounts[0]  # Treasurer only has access to his account
         amount = self.get_amount("Gib den Einzahlungsbetrag ein:")
         if amount is None:
             return
@@ -68,10 +69,10 @@ class KassenwartDashboard:
         messagebox.showinfo("Einzahlung", result.get("success", result.get("error", "Fehler")))
 
     def get_amount(self, prompt: str):
-        """Zeigt einen Dialog zur Eingabe eines Betrags und validiert die Eingabe."""
+        """Shows a dialog for entering an amount and validates the entry."""
         while True:
             amount_str = simpledialog.askstring("Betragseingabe", prompt)
-            if amount_str is None:  # Benutzer hat Abbrechen gedrückt
+            if amount_str is None:  # User has pressed Cancel
                 return None
             try:
                 amount = float(amount_str)
@@ -83,7 +84,7 @@ class KassenwartDashboard:
                 messagebox.showerror("Fehler", "Bitte eine gültige Zahl eingeben!")
 
     def withdraw_money(self):
-        """Ermöglicht dem Kassenwart eine Auszahlung."""
+        """Allows the treasurer to make a payment."""
         print("[DEBUG] Auszahlung wurde angeklickt.")
 
         if not self.allowed_accounts:
@@ -108,7 +109,7 @@ class KassenwartDashboard:
         messagebox.showinfo("Auszahlung", result.get("success", result.get("error", "Fehler")))
 
     def transfer_money(self):
-        """Ermöglicht dem Kassenwart eine Umbuchung zwischen seinen Konten."""
+        """Allows the treasurer to transfer funds between his accounts."""
         print("[DEBUG] Umbuchung wurde angeklickt.")
 
         if len(self.allowed_accounts) < 2:
@@ -138,45 +139,21 @@ class KassenwartDashboard:
 
         messagebox.showinfo("Umbuchung", result.get("success", result.get("error", "Fehler")))
 
-    def deposit_money(self):
-        """Ermöglicht dem Kassenwart eine Einzahlung auf ein bestimmtes Konto."""
-        print("[DEBUG] Einzahlung wurde angeklickt.")
 
-        if not self.allowed_accounts:
-            messagebox.showerror("Fehler", "Du hast keine zugewiesenen Konten!")
-            return
-
-        account = simpledialog.askstring("Konto auswählen", "Auf welches Konto soll eingezahlt werden?",
-                                         initialvalue=self.allowed_accounts[0])
-        if account not in self.allowed_accounts:
-            messagebox.showerror("Fehler", "Ungültiges Konto ausgewählt.")
-            return
-
-        amount = self.get_amount("Gib den Einzahlungsbetrag ein:")
-        if amount is None:
-            return
-
-        source = simpledialog.askstring("Quelle", "Woher kommt das Geld?")
-        note = simpledialog.askstring("Notiz", "Gibt es eine Notiz zur Einzahlung?")
-
-        result = self.account_manager.deposit(account, amount, source, note)
-        print(f"[DEBUG] Einzahlungsergebnis: {result}")
-
-        messagebox.showinfo("Einzahlung", result.get("success", result.get("error", "Fehler")))
 
     def show_transactions(self):
-        """Zeigt die Transaktionshistorie für das Konto des Kassenwarts."""
+        """Shows the transaction history for the cashier's account."""
 
-        # Prüfe, ob der Kassenwart Zugriff auf ein oder mehrere Konten hat
+        # Check whether the treasurer has access to one or more accounts
         if not self.allowed_accounts:
             messagebox.showerror("Fehler", "Du hast keine Konten zugewiesen!")
             return
 
-        # Falls der Kassenwart nur ein Konto hat, wähle es direkt
+        # If the treasurer only has one account, select it directly
         if len(self.allowed_accounts) == 1:
             account = self.allowed_accounts[0]
         else:
-            # Falls mehrere Konten verfügbar sind, kann er eines auswählen
+            # If several accounts are available, he can select one
             account = simpledialog.askstring(
                 "Konto auswählen",
                 "Wähle ein Konto zur Anzeige der Transaktionshistorie:",
@@ -187,7 +164,7 @@ class KassenwartDashboard:
             messagebox.showerror("Fehler", "Ungültige Kontoauswahl.")
             return
 
-        # Transaktionshistorie abrufen
+
         transactions = self.account_manager.get_transaction_history(account)
         print(f"[DEBUG] Transaktionshistorie für {account}: {transactions}")
 
@@ -195,20 +172,19 @@ class KassenwartDashboard:
             messagebox.showerror("Fehler", transactions["error"])
             return
 
-        # Neues Fenster für die Transaktionshistorie
+        # New window for the transaction history
         history_window = tk.Toplevel(self.root)
         history_window.title(f"Transaktionshistorie - {account}")
         history_window.geometry("600x400")
 
-        # Überschrift
+
         tk.Label(history_window, text=f"Transaktionshistorie für Konto: {account}", font=("Arial", 14, "bold")).pack(
             pady=10)
 
-        # Falls keine Transaktionen vorhanden sind
+        # If no transactions are available
         if not transactions:
             tk.Label(history_window, text="Keine Transaktionen gefunden!", fg="red").pack(pady=10)
         else:
-            # Transaktionen anzeigen
             for transaction in transactions:
                 text = (
                     f"Datum: {transaction['date']}, "
@@ -219,22 +195,20 @@ class KassenwartDashboard:
                 )
                 tk.Label(history_window, text=text, anchor="w", justify="left", wraplength=580).pack(pady=2)
 
-        # Schließen-Button
+        # Close button
         tk.Button(history_window, text="Schließen", command=history_window.destroy).pack(pady=10)
 
-        tk.Button(self.root, text="Logout", command=self.logout).pack(pady=10)
 
     def logout(self):
-        """Schließt das aktuelle Fenster und zeigt das Login-Fenster wieder an."""
+        """Closes the current window and displays the login window again."""
         if messagebox.askyesno("Logout", "Möchtest du dich wirklich ausloggen?"):
-            self.root.destroy()  # Schließt das aktuelle Fenster
-            import login_gui  # Stellt sicher, dass das Login-Fenster geladen wird
-            login_gui.root.deiconify()  # Zeigt das Login-Fenster wieder an
+            self.root.destroy()
+            import login_gui
+            login_gui.root.deiconify()
 
 
 if __name__ == "__main__":
-    # Test-Modus: Standard-Benutzer für Direktstart
-    test_username = "Lisa"  # Standard-Benutzername für Testzwecke
+    test_username = "Lisa"
     print(f"[DEBUG] Starte Kassenwart-GUI im Testmodus für Benutzer: {test_username}")
 
     root = tk.Tk()

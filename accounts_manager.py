@@ -4,23 +4,23 @@ import os
 import datetime
 from typing import List, Dict
 
-class Account:
-    """Represents a department account with balance and transactions."""
+"""class Account:
+    ""Represents a department account with balance and transactions.""
 
-    def __init__(self, department: str, balance: float = 0.0, transactions=None):
+     def __init__(self, department: str, balance: float = 0.0, transactions=None):
         self.department = department
         self.balance = balance
         self.transactions = transactions if transactions else []
 
     def to_dict(self) -> Dict:
-        """Returns the account as a dictionary."""
+        ""Returns the account as a dictionary.""
         return {
             "balance": self.balance,
             "transactions": self.transactions
         }
 
     def __repr__(self):
-        return f"Account(department={self.department}, balance={self.balance}, transactions={len(self.transactions)})"
+        return f"Account(department={self.department}, balance={self.balance}, transactions={len(self.transactions)})"""
 
 
 class Transaction:
@@ -193,11 +193,16 @@ class AccountManager:
                 file.write(f"Current Balance: {account['balance']}€\n")
                 file.write("\n--- Transactions ---\n")
                 for t in account["transactions"]:
-                    file.write(f"{t['date']} | {t['type']}: {t['amount']}€ | Source: {t['source']} | Note: {t['note']} | Target: {t['target_account'] if t['target_account'] else '-'}\n")
+                    file.write(
+                        f"{t['date']} | {t['type']}: {t['amount']}€ | Source: {t['source']} | Note: {t['note']} | "
+                        f"Target: {t.get('target_account', '-')}\n"
+                    )
         except IOError as e:
             print(f"[ERROR] Could not export account: {e}")
+            return {"error": f"Konnte Datei nicht exportieren: {e}"}  # **Fehlermeldung zurückgeben**
 
         print(f" Account '{name}' was saved in '{filename}'.")
+        return {"success": f"Konto '{name}' wurde erfolgreich exportiert."}
 
     def get_all_accounts_summary(self):
         """Gibt eine Liste aller Konten mit Saldo und Gesamtsumme zurück."""
