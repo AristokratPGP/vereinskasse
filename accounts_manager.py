@@ -1,3 +1,4 @@
+__author__ = "7985984, Saghdaou, 8441241, Fischer"
 import json
 import os
 import datetime
@@ -59,30 +60,33 @@ class AccountManager:
         self.data = self.load_data()
 
         if "accounts" not in self.data or not isinstance(self.data["accounts"], dict):
-            print("[DEBUG] Fehler: `accounts` fehlt oder ist ungültig. Initialisiere es neu.")
+            print(" Fehler: `accounts` fehlt oder ist ungültig. Initialisiere es neu.")
             self.data["accounts"] = {}
 
-        print("[DEBUG] self.data nach Laden:", self.data)
+        print(" self.data nach Laden:", self.data)
 
     def load_data(self):
         """Loads accounts and transactions from the JSON file."""
-        print("[DEBUG] Loading data from JSON...")
+        print(" Loading data from JSON...")
         try:
             with open(AccountManager.JSON_FILE, "r", encoding="utf-8") as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
-            print("[DEBUG] Error: JSON file not found or invalid. Creating a new file.")
+            print(" [ERROR] JSON file not found or invalid. Creating a new file.")
             return {"accounts": {}, "users": {}}
 
     def save_data(self):
         """Saves data to the JSON file."""
-        print("[DEBUG] Saving data to JSON...")
-        with open(AccountManager.JSON_FILE, "w", encoding="utf-8") as file:
-            json.dump(self.data, file, indent=4, ensure_ascii=False)
+        print(" Saving data to JSON...")
+        try:
+            with open(AccountManager.JSON_FILE, "w", encoding="utf-8") as file:
+                json.dump(self.data, file, indent=4, ensure_ascii=False)
+        except IOError as e:
+            print(f"[ERROR] Could not save data: {e}")
 
     def create_account(self, name: str) -> Dict:
         """Creates a new department account."""
-        print(f"[DEBUG] Creating account: {name}")
+        print(f" Creating account: {name}")
 
         if name in self.data["accounts"]:
             return {"error": f"Account '{name}' already exists."}
@@ -93,13 +97,14 @@ class AccountManager:
 
     def delete_account(self, name: str) -> Dict:
         """Deletes an account if the balance is zero."""
-        print(f"[DEBUG] Deleting account: {name}")
+        print(f" Deleting account: {name}")
 
         if name not in self.data["accounts"]:
             return {"error": f"Account '{name}' does not exist."}
 
-        if self.data["accounts"][name]["balance"] > 0:
-            return {"error": f"Account '{name}' still has funds and cannot be deleted."}
+        if self.data["accounts"][name]["balance"] != 0:
+            return {"error": f"Account '{name}' still has a non-zero balance and cannot be deleted."}
+
 
         del self.data["accounts"][name]
         self.save_data()
@@ -107,7 +112,7 @@ class AccountManager:
 
     def deposit(self, name: str, amount: float, source: str, note: str = "") -> Dict:
         """Deposits money into an account."""
-        print(f"[DEBUG] Deposit: {amount}€ into '{name}'")
+        print(f" Deposit: {amount}€ into '{name}'")
 
         if name not in self.data["accounts"]:
             return {"error": f"Account '{name}' does not exist."}
@@ -123,7 +128,7 @@ class AccountManager:
 
     def withdraw(self, name: str, amount: float, note: str = "") -> Dict:
         """Withdraws money from an account."""
-        print(f"[DEBUG] Withdrawal: {amount}€ from '{name}'")
+        print(f" Withdrawal: {amount}€ from '{name}'")
 
         if name not in self.data["accounts"]:
             return {"error": f"Account '{name}' does not exist."}
@@ -131,8 +136,9 @@ class AccountManager:
         if amount <= 0:
             return {"error": "Amount must be positive."}
 
-        if self.data["accounts"][name]["balance"] < amount:
-            return {"error": "Insufficient funds."}
+        new_balance = self.data["accounts"][name]["balance"] - amount
+        if new_balance < 0:
+            return {"error": "Insufficient funds. Withdrawal denied."}
 
         self.data["accounts"][name]["balance"] -= amount
         transaction = Transaction(name, "Withdrawal", amount, "Account", note).to_dict()
@@ -142,7 +148,7 @@ class AccountManager:
 
     def get_transaction_history(self, name: str) -> List[Dict]:
         """Returns the transaction history of an account."""
-        print(f"[DEBUG] Loading transaction history for account: {name}")
+        print(f" Loading transaction history for account: {name}")
 
         if name not in self.data["accounts"]:
             return {"error": f"Account '{name}' does not exist."}
@@ -151,7 +157,7 @@ class AccountManager:
 
     def transfer(self, from_account: str, to_account: str, amount: float, note: str = "") -> Dict:
         """Transfers money between two accounts."""
-        print(f"[DEBUG] Transfer: {amount}€ from '{from_account}' to '{to_account}'")
+        print(f" Transfer: {amount}€ from '{from_account}' to '{to_account}'")
 
         if from_account not in self.data["accounts"] or to_account not in self.data["accounts"]:
             return {"error": "One of the accounts does not exist."}
@@ -172,7 +178,7 @@ class AccountManager:
 
     def export_account_to_txt(self, name: str):
         """Saves an account with its balance and transactions to a .txt file."""
-        print(f"[DEBUG] Exporting account '{name}' to .txt")
+        print(f" Exporting account '{name}' to .txt")
 
         if name not in self.data["accounts"]:
             print(f"[ERROR] Account '{name}' does not exist.")
@@ -181,18 +187,21 @@ class AccountManager:
         account = self.data["accounts"][name]
         filename = f"{name}_account.txt"
 
-        with open(filename, "w", encoding="utf-8") as file:
-            file.write(f"Account: {name}\n")
-            file.write(f"Current Balance: {account['balance']}€\n")
-            file.write("\n--- Transactions ---\n")
-            for t in account["transactions"]:
-                file.write(f"{t['date']} | {t['type']}: {t['amount']}€ | Source: {t['source']} | Note: {t['note']} | Target: {t['target_account'] if t['target_account'] else '-'}\n")
+        try:
+            with open(filename, "w", encoding="utf-8") as file:
+                file.write(f"Account: {name}\n")
+                file.write(f"Current Balance: {account['balance']}€\n")
+                file.write("\n--- Transactions ---\n")
+                for t in account["transactions"]:
+                    file.write(f"{t['date']} | {t['type']}: {t['amount']}€ | Source: {t['source']} | Note: {t['note']} | Target: {t['target_account'] if t['target_account'] else '-'}\n")
+        except IOError as e:
+            print(f"[ERROR] Could not export account: {e}")
 
-        print(f"[DEBUG] Account '{name}' was saved in '{filename}'.")
+        print(f" Account '{name}' was saved in '{filename}'.")
 
     def get_all_accounts_summary(self):
         """Gibt eine Liste aller Konten mit Saldo und Gesamtsumme zurück."""
-        print("[DEBUG] Erstelle Konto-Übersicht...")
+        print(" Erstelle Konto-Übersicht...")
 
         if "accounts" not in self.data or not isinstance(self.data["accounts"], dict):
             print("[ERROR] `accounts` fehlt oder ist ungültig.")
@@ -205,7 +214,7 @@ class AccountManager:
         total_sum = sum(account["balance"] for account in self.data["accounts"].values())
         accounts_list = [f"{name}: {account['balance']}€" for name, account in self.data["accounts"].items()]
 
-        print(f"[DEBUG] Gesamtguthaben: {total_sum}€")
+        print(f" Gesamtguthaben: {total_sum}€")
 
         return {
             "accounts": accounts_list,

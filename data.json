@@ -81,31 +81,29 @@
     },
     "users": {
         "Hans": {
-            "passwort": "hans123",
-            "rolle": "Kassenwart",
-            "konten": [
-                "Basketball"
-            ]
+            "password": "",
+            "role": "Finance-Referent",
+            "accounts": []
         },
         "Lisa": {
-            "passwort": "lisa456",
-            "rolle": "Referent-Finanzen",
-            "konten": []
+            "password": "",
+            "role": "Finance-Referent",
+            "accounts": []
         },
         "Admin": {
-            "passwort": "admin789",
-            "rolle": "Administrator",
-            "konten": []
+            "password": "",
+            "role": "Finance-Referent",
+            "accounts": []
         },
         "Max": {
-            "passwort": "neuesPasswort",
-            "rolle": "Referent-Finanzen",
-            "konten": []
+            "password": "newPassword",
+            "role": "Finance-Referent",
+            "accounts": []
         },
         "Anna": {
-            "passwort": "anna456",
-            "rolle": "Referent-Finanzen",
-            "konten": []
+            "password": "",
+            "role": "Finance-Referent",
+            "accounts": []
         }
     }
 }

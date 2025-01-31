@@ -1,3 +1,4 @@
+__author__ = "7985984, Saghdaou, 8441241, Fischer"
 import tkinter as tk
 from tkinter import simpledialog
 from tkinter import messagebox
