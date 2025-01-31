@@ -141,7 +141,7 @@ class KassenwartDashboard:
 
 if __name__ == "__main__":
     # Test-Modus: Standard-Benutzer für Direktstart
-    test_username = "Hans"  # Standard-Benutzername für Testzwecke
+    test_username = "Lisa"  # Standard-Benutzername für Testzwecke
     print(f"[DEBUG] Starte Kassenwart-GUI im Testmodus für Benutzer: {test_username}")
 
     root = tk.Tk()

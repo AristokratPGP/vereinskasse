@@ -48,10 +48,10 @@ def login():
             # Richtige GUI starten
             if role == "Administrator":
                 open_admin_gui()
-            elif role == "Kassenwart":
+            elif role == "treasurer":
                 root.withdraw()  # Versteckt das Login-Fenster
                 open_kassenwart_gui(username)
-            elif role == "Referent-Finanzen":
+            elif role == "Finance-Referent":
                 open_finanzen_gui()
         else:
             print("[DEBUG] Passwort stimmt nicht überein!")  # Debugging

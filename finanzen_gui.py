@@ -106,13 +106,13 @@ class FinanzenDashboard:
                 trans_frame.pack(fill="x", pady=5)
 
                 # Transaktionsdetails
-                tk.Label(trans_frame, text=f"Datum: {transaction['datum']}", anchor="w", bg="#f9f9f9").pack(anchor="w")
-                tk.Label(trans_frame, text=f"Typ: {transaction['typ']}, Betrag: {transaction['betrag']}€", anchor="w",
+                tk.Label(trans_frame, text=f"date: {transaction['date']}", anchor="w", bg="#f9f9f9").pack(anchor="w")
+                tk.Label(trans_frame, text=f"type: {transaction['type']}, amount: {transaction['amount']}€", anchor="w",
                          bg="#f9f9f9").pack(anchor="w")
-                tk.Label(trans_frame, text=f"Quelle: {transaction['quelle']}", anchor="w", bg="#f9f9f9").pack(
+                tk.Label(trans_frame, text=f"source: {transaction['source']}", anchor="w", bg="#f9f9f9").pack(
                     anchor="w")
-                if transaction['notiz']:
-                    tk.Label(trans_frame, text=f"Notiz: {transaction['notiz']}", anchor="w", bg="#f9f9f9").pack(
+                if transaction['note']:
+                    tk.Label(trans_frame, text=f"note: {transaction['note']}", anchor="w", bg="#f9f9f9").pack(
                         anchor="w")
 
     def logout(self):

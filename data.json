@@ -45,7 +45,7 @@
                     "zielkonto": null
                 },
                 {
-                    "datum": "2025-01-29 18:30:42",
+                    "date": "2025-01-29 18:30:42",
                     "konto": "Fußball",
                     "type": "Auszahlung",
                     "amount": 100,
@@ -81,14 +81,14 @@
     },
     "users": {
         "Hans": {
-            "password": "",
+            "password": "hans123",
             "role": "Finance-Referent",
-            "accounts": []
+            "accounts": ""
         },
         "Lisa": {
-            "password": "",
-            "role": "Finance-Referent",
-            "accounts": []
+            "password": "lisa123",
+            "role": "treasurer",
+            "accounts": ["Basketball"]
         },
         "Admin": {
             "password": "",
