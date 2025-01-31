@@ -141,7 +141,7 @@
         },
         "Lisa": {
             "password": "lisa123",
-            "role": "treasurer",
+            "role": "Treasurer",
             "accounts": [
                 "Basketball",
                 "Fußball"
@@ -161,6 +161,23 @@
             "password": "",
             "role": "Finance-Referent",
             "accounts": []
+        },
+        "Ayoub": {
+            "password": "ayoub123",
+            "role": "Treasurer",
+            "accounts": []
+        },
+        "Erik": {
+            "password": "erik123",
+            "role": "Treasurer",
+            "accounts": []
+        },
+        "hallo": {
+            "password": "hallo123",
+            "role": "Treasurer",
+            "accounts": [
+                "Basketball"
+            ]
         }
     }
 }

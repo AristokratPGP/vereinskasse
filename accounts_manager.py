@@ -212,11 +212,14 @@ class AccountManager:
             return {"error": "No accounts available."}
 
         total_sum = sum(account["balance"] for account in self.data["accounts"].values())
-        accounts_list = [f"{name}: {account['balance']}€" for name, account in self.data["accounts"].items()]
+
+        # **Fix: Liste von Dictionaries erstellen, statt Strings**
+        accounts_list = [{"name": name, "balance": account["balance"]} for name, account in
+                         self.data["accounts"].items()]
 
         print(f" Gesamtguthaben: {total_sum}€")
 
         return {
-            "accounts": accounts_list,
+            "accounts": accounts_list,  # Jetzt eine Liste von Dictionaries!
             "total_balance": total_sum
         }

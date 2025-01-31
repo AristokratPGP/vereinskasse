@@ -222,11 +222,15 @@ class KassenwartDashboard:
         # Schließen-Button
         tk.Button(history_window, text="Schließen", command=history_window.destroy).pack(pady=10)
 
+        tk.Button(self.root, text="Logout", command=self.logout).pack(pady=10)
+
     def logout(self):
-        print("[DEBUG] Logout wurde angeklickt.")
+        """Schließt das aktuelle Fenster und zeigt das Login-Fenster wieder an."""
         if messagebox.askyesno("Logout", "Möchtest du dich wirklich ausloggen?"):
-            self.root.destroy()
-            root.deiconify()  # Zeigt das Login-Fenster wieder an
+            self.root.destroy()  # Schließt das aktuelle Fenster
+            import login_gui  # Stellt sicher, dass das Login-Fenster geladen wird
+            login_gui.root.deiconify()  # Zeigt das Login-Fenster wieder an
+
 
 if __name__ == "__main__":
     # Test-Modus: Standard-Benutzer für Direktstart

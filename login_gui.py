@@ -48,7 +48,7 @@ def login():
             # Richtige GUI starten
             if role == "Administrator":
                 open_admin_gui()
-            elif role == "treasurer":
+            elif role == "Treasurer":
                 root.withdraw()  # Versteckt das Login-Fenster
                 open_kassenwart_gui(username)
             elif role == "Finance-Referent":

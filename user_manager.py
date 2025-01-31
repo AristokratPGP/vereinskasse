@@ -151,7 +151,7 @@ class UserManager:
 
         user = self.users[username]
 
-        if user.role != "treasurer":
+        if user.role != "Treasurer":
             return {"error": "Benutzer ist kein Kassenwart."}
 
         return {"accounts": user.accounts}
