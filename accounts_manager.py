@@ -164,21 +164,80 @@ class AccountManager:
         self.save_data()
         return {"success": f"{amount}€ von '{from_account}' auf '{to_account}' überwiesen.", "transaction": transaction}
 
+    def export_account_to_txt(self, name: str):
+        """Speichert ein Konto mit Kontostand und Transaktionen in eine .txt-Datei."""
+        print(f"[DEBUG] Exportiere Konto '{name}' nach .txt")
+
+        if name not in self.data["konten"]:
+            print(f"[ERROR] Konto '{name}' existiert nicht.")
+            return
+
+        konto = self.data["konten"][name]
+        filename = f"{name}_konto.txt"
+
+        with open(filename, "w", encoding="utf-8") as file:
+            file.write(f"Konto: {name}\n")
+            file.write(f"Aktueller Kontostand: {konto['saldo']}€\n")
+            file.write("\n--- Transaktionen ---\n")
+            for t in konto["transaktionen"]:
+                file.write(f"{t['datum']} | {t['typ']}: {t['betrag']}€ | Quelle: {t['quelle']} | Notiz: {t['notiz']} | Ziel: {t['zielkonto'] if t['zielkonto'] else '-'}\n")
+
+        print(f"[DEBUG] Konto '{name}' wurde in '{filename}' gespeichert.")
+
+    def get_all_accounts_summary(self):
+        """Gibt eine Liste aller Vereinskonten mit aktuellem Kassenstand und die Gesamtsumme aller Konten aus."""
+        print("[DEBUG] Erstelle Übersicht aller Vereinskonten...")
+
+        if not self.data["konten"]:
+            print("[ERROR] Keine Konten gefunden.")
+            return {"error": "Keine Konten vorhanden."}
+
+        total_sum = 0
+        konten_list = []
+
+        for name, konto in self.data["konten"].items():
+            saldo = konto["saldo"]
+            total_sum += saldo
+            konten_list.append(f"{name}: {saldo}€")
+
+        print(f"[DEBUG] Gesamtsumme aller Konten: {total_sum}€")
+
+        return {
+            "konten": konten_list,
+            "gesamt_summe": total_sum
+        }
+
 
 def main():
     manager = AccountManager()
 
-    print(manager.create_account("Tanzen"))
-    print(manager.create_account("Basketball"))
+    print("\n### Konto erstellen ###")
+    print(manager.create_account("Tanzen"))  # Erfolgreich
+    print(manager.create_account("Tanzen"))  # Fehler: Konto existiert bereits
 
-    print(manager.deposit("Tanzen", 200, "Mitgliedsbeitrag", "Januar Beitrag"))
-    print(manager.deposit("Basketball", 300, "Sponsor", "Spende von Firma XYZ"))
+    print("\n### Geld einzahlen ###")
+    print(manager.deposit("Tanzen", 200, "Mitgliedsbeitrag"))  # Erfolgreich
+    print(manager.deposit("NichtVorhanden", 100, "Spende"))  # Fehler: Konto existiert nicht
+    print(manager.deposit("Tanzen", -50, "Spende"))  # Fehler: Betrag negativ
 
-    print(manager.withdraw("Tanzen", 50, "Neue Trikots"))
-    
-    print(manager.transfer("Basketball", "Tanzen", 100, "Ausgleich"))
+    print("\n### Geld auszahlen ###")
+    print(manager.withdraw("Tanzen", 50, "Trikots"))  # Erfolgreich
+    print(manager.withdraw("Tanzen", 500, "Miete"))  # Fehler: Nicht genügend Guthaben
+    print(manager.withdraw("NichtVorhanden", 10, "Test"))  # Fehler: Konto existiert nicht
 
-    print(manager.delete_account("Tanzen"))
+    print("\n### Konto-Export testen ###")
+    manager.export_account_to_txt("Tanzen")  # Erfolgreich
+    manager.export_account_to_txt("NichtVorhanden")  # Fehler: Konto existiert nicht
+
+    print("\n### Übersicht aller Konten ###")
+    summary = manager.get_all_accounts_summary()
+    print("\n".join(summary["konten"]))
+    print(f"Gesamtsumme aller Konten: {summary['gesamt_summe']}€")
+
+    print("\n### Konto löschen ###")
+    print(manager.create_account("Testkonto"))
+    print(manager.delete_account("Testkonto"))  # Erfolgreich
+    print(manager.delete_account("Tanzen"))  # Fehler: Konto hat noch Guthaben
 
 
 if __name__ == "__main__":
