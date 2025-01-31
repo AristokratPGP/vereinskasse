@@ -4,30 +4,30 @@
             "balance": 150,
             "transactions": [
                 {
-                    "datum": "2025-01-31 09:48:17",
+                    "date": "2025-01-31 09:48:17",
                     "konto": "Tanzen",
-                    "typ": "Einzahlung",
-                    "betrag": 200,
-                    "quelle": "Mitgliedsbeitrag",
-                    "notiz": "",
+                    "type": "Einzahlung",
+                    "amount": 200,
+                    "source": "Mitgliedsbeitrag",
+                    "note": "",
                     "zielkonto": null
                 },
                 {
-                    "datum": "2025-01-31 09:48:17",
+                    "date": "2025-01-31 09:48:17",
                     "konto": "Tanzen",
-                    "typ": "Auszahlung",
-                    "betrag": 50,
-                    "quelle": "Konto",
+                    "type": "Auszahlung",
+                    "amount": 50,
+                    "source": "Konto",
                     "notiz": "Trikots",
                     "zielkonto": null
                 },
                 {
-                    "datum": "2025-01-30 01:48:17",
+                    "date": "2025-01-30 01:48:17",
                     "konto": "Tanzen",
-                    "typ": "Auszahlung",
-                    "betrag": 53,
-                    "quelle": "Konto",
-                    "notiz": "Ball",
+                    "type": "Auszahlung",
+                    "amount": 53,
+                    "source": "Konto",
+                    "note": "Ball",
                     "zielkonto": null
                 }
             ]
@@ -36,44 +36,44 @@
             "balance": 500,
             "transactions": [
                 {
-                    "datum": "2025-01-30 14:12:05",
+                    "date": "2025-01-30 14:12:05",
                     "konto": "Fußball",
-                    "typ": "Einzahlung",
-                    "betrag": 300,
-                    "quelle": "Sponsoring",
-                    "notiz": "Firma X",
+                    "type": "Einzahlung",
+                    "amount": 300,
+                    "source": "Sponsoring",
+                    "note": "Firma X",
                     "zielkonto": null
                 },
                 {
                     "datum": "2025-01-29 18:30:42",
                     "konto": "Fußball",
-                    "typ": "Auszahlung",
-                    "betrag": 100,
-                    "quelle": "Konto",
-                    "notiz": "Trainingsmaterial",
+                    "type": "Auszahlung",
+                    "amount": 100,
+                    "source": "Konto",
+                    "note": "Trainingsmaterial",
                     "zielkonto": null
                 }
             ]
         },
-        "Schach": {
+        "Basketball": {
             "balance": 250,
             "transactions": [
                 {
-                    "datum": "2025-01-28 16:20:00",
+                    "date": "2025-01-28 16:20:00",
                     "konto": "Schach",
-                    "typ": "Einzahlung",
-                    "betrag": 150,
-                    "quelle": "Turniereinnahmen",
-                    "notiz": "",
+                    "type": "Einzahlung",
+                    "amount": 150,
+                    "source": "Turniereinnahmen",
+                    "note": "",
                     "zielkonto": null
                 },
                 {
-                    "datum": "2025-01-27 10:05:33",
+                    "date": "2025-01-27 10:05:33",
                     "konto": "Schach",
-                    "typ": "Auszahlung",
-                    "betrag": 50,
-                    "quelle": "Konto",
-                    "notiz": "Schachbretter",
+                    "type": "Auszahlung",
+                    "amount": 50,
+                    "source": "Konto",
+                    "note": "Schachbretter",
                     "zielkonto": null
                 }
             ]

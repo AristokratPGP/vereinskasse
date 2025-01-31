@@ -130,6 +130,20 @@ class UserManager:
             for user in self.users.values()
         ])
 
+    def get_kassenwart_accounts(self, username: str):
+        """Gibt die Liste der Konten zurück, auf die ein Kassenwart Zugriff hat."""
+        print(f"[DEBUG] Lade Konten für Kassenwart: {username}")
+
+        if username not in self.users:
+            return {"error": "Benutzer nicht gefunden."}
+
+        user = self.users[username]
+
+        if user.role != "Kassenwart":
+            return {"error": "Benutzer ist kein Kassenwart."}
+
+        return {"accounts": user.accounts}
+
 
 def main():
     """Tests all functions of the UserManager."""

@@ -6,8 +6,9 @@ import sys
 import accounts_manager
 
 class FinanzenDashboard:
-    def __init__(self, root):
+    def __init__(self, root, login_root):
         self.root = root
+        self.login_root = login_root
         self.root.title("Vereinskassen-System - Finanzen Dashboard")
         self.root.geometry("400x400")
 
@@ -16,6 +17,19 @@ class FinanzenDashboard:
         tk.Button(self.root, text="Gesamtübersicht aller Konten", command=self.view_overview).pack(pady=0, fill="x")
         tk.Button(self.root, text="Logout", command=self.logout).pack(pady=20)
         tk.Button(self.root, text="Beenden", command=self.root.quit).pack(pady=0)
+
+    def show_dashboard(self):
+        """Kehrt vom 'view_overview' zurück zum Finanz-Dashboard."""
+        for widget in self.root.winfo_children():
+            widget.destroy()  # Löscht die aktuellen Widgets
+
+        # Dashboard-Überschrift
+        tk.Label(self.root, text="Finanzen Dashboard", font=("Arial", 14, "bold")).pack(pady=20)
+
+        # Buttons für die Hauptoptionen des Dashboards
+        tk.Button(self.root, text="Gesamtübersicht aller Konten", command=self.view_overview).pack(pady=5, fill="x")
+        tk.Button(self.root, text="Logout", command=self.logout).pack(pady=5, fill="x")
+        tk.Button(self.root, text="Beenden", command=self.root.quit).pack(pady=5, fill="x")
 
     def view_overview(self):
         """Zeigt eine Übersicht aller existierenden Konten mit Namen und Saldo an."""
@@ -47,7 +61,8 @@ class FinanzenDashboard:
         tk.Label(self.root, text=f"Gesamtsumme aller Konten: {accounts_data['total_balance']}€",
                  font=("Arial", 12, "bold")).pack(pady=10)
 
-        tk.Button(self.root, text="Zurück", command=self.__init__).pack(pady=10)
+        tk.Button(self.root, text="Zurück", command=self.show_dashboard).pack(pady=10)  # Zurück zur Übersicht
+        tk.Button(self.root, text="Logout", command=self.logout).pack(pady=10)
 
     def view_account_history(self, account_name):
         """Zeigt die Transaktionshistorie für ein spezifisches Konto."""
@@ -99,25 +114,13 @@ class FinanzenDashboard:
                     tk.Label(trans_frame, text=f"Notiz: {transaction['notiz']}", anchor="w", bg="#f9f9f9").pack(
                         anchor="w")
 
-        # Zurück-Button
-        tk.Button(history_window, text="Schließen", command=history_window.destroy).pack(pady=10)
-
     def logout(self):
-        """Schließt das Fenster und öffnet die Login-GUI."""
+        """Schließt das Finanz-Fenster und zeigt das Login-Fenster wieder an."""
         if messagebox.askyesno("Logout", "Möchtest du dich wirklich ausloggen?"):
-            self.root.destroy()  # Schließt das aktuelle Fenster
+            self.root.destroy()  # Schließt das Finanz-Fenster
 
-            # Betriebssystem prüfen
-            IS_WINDOWS = sys.platform.startswith("win")
-            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-            LOGIN_GUI_PATH = os.path.join(BASE_DIR, "login_gui.py")
-            PYTHON_CMD = "python" if IS_WINDOWS else "python3"
-
-            # Login GUI neu starten
-            if IS_WINDOWS:
-                subprocess.Popen([PYTHON_CMD, LOGIN_GUI_PATH], shell=True)
-            else:
-                subprocess.Popen([PYTHON_CMD, LOGIN_GUI_PATH])
+            if self.login_root:
+                self.login_root.deiconify()  # Zeigt das Login-Fenster wieder an
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -1,18 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
-import subprocess
 import os
 import sys
-import json
 from user_manager import UserManager
+from finanzen_gui import FinanzenDashboard
+from kassenwart_gui import KassenwartDashboard
 
 # Betriebssystem prüfen
 IS_WINDOWS = sys.platform.startswith("win")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Basisverzeichnis des Skripts
-ADMIN_GUI_PATH = os.path.join(BASE_DIR, "admin_gui.py")
-KASSENWART_GUI_PATH = os.path.join(BASE_DIR, "kassenwart_gui.py")
-FINANZEN_GUI_PATH = os.path.join(BASE_DIR, "finanzen_gui.py")
 
 
 # Login-Funktion
@@ -25,9 +22,6 @@ def login():
     if not username or not password:
         messagebox.showerror("Fehler", "Benutzername und Passwort eingeben!")
         return
-
-
-   
 
     print(f"[DEBUG] Benutzername eingeben: {username}")
     print(f"[DEBUG] Passwort eingeben: {password}")
@@ -46,28 +40,47 @@ def login():
                 message += f"\nZugriff auf Konten: {', '.join(konten)}"
 
             messagebox.showinfo("Login Erfolgreich", message)
-            root.destroy()  # Schließt das Login-Fenster
 
-            def start_gui(script_path):
-                """Startet das jeweilige GUI-Skript"""
-                if IS_WINDOWS:
-                    subprocess.Popen(["python", script_path], shell=True)
-                else:
-                    subprocess.Popen(["python3", script_path])
+            # Verstecke das Login-Fenster anstatt es zu zerstören
+            root.withdraw()
 
             # Richtige GUI starten
             if role == "Administrator":
-                start_gui(ADMIN_GUI_PATH)
+                open_admin_gui()
             elif role == "Kassenwart":
-                start_gui(KASSENWART_GUI_PATH)
+                root.withdraw()  # Versteckt das Login-Fenster
+                open_kassenwart_gui(username)
             elif role == "Referent-Finanzen":
-                start_gui(FINANZEN_GUI_PATH)
+                open_finanzen_gui()
         else:
             print("[DEBUG] Passwort stimmt nicht überein!")  # Debugging
             messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
     else:
         print("[DEBUG] Benutzer nicht gefunden!")  # Debugging
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
+
+def open_admin_gui():
+    """Öffnet die Administrator-GUI in einem neuen Fenster."""
+    admin_window = tk.Toplevel(root)
+    admin_window.title("Administrator - Vereinskassen-System")
+    tk.Label(admin_window, text="Willkommen in der Admin-GUI!", font=("Arial", 14)).pack(pady=20)
+    tk.Button(admin_window, text="Zurück", command=lambda: go_back_to_login(admin_window)).pack(pady=20)
+
+def open_kassenwart_gui(username):
+    """Öffnet die Kassenwart-GUI mit dem richtigen Dashboard."""
+    kassenwart_window = tk.Toplevel(root)  # Neues Fenster
+    KassenwartDashboard(kassenwart_window, username)
+
+def open_finanzen_gui():
+    """Öffnet die Finanz-GUI in einem neuen Fenster und übergibt die `root`-Instanz."""
+    finanzen_window = tk.Toplevel(root)
+    finanzen_window.title("Vereinskassen-System - Finanzen Dashboard")
+    FinanzenDashboard(finanzen_window, root)  # `root` als Argument übergeben
+
+def go_back_to_login(window):
+    """Schließt ein geöffnetes Fenster und zeigt das Login-Fenster wieder an."""
+    window.destroy()
+    root.deiconify()
 
 # GUI erstellen
 root = tk.Tk()
