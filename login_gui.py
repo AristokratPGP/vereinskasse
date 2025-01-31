@@ -14,7 +14,7 @@ KASSENWART_GUI_PATH = os.path.join(BASE_DIR, "kassenwart_gui.py")
 FINANZEN_GUI_PATH = os.path.join(BASE_DIR, "finanzen_gui.py")
 
 # JSON-Datei laden
-JSON_FILE = "data.json"
+JSON_FILE = os.path.join(os.path.dirname(__file__), "data.json")
 
 def load_users():
     """Lädt die Benutzer aus der JSON-Datei in ein Dictionary."""

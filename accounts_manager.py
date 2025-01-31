@@ -3,55 +3,55 @@ import os
 import datetime
 from typing import List, Dict
 
-class Konto:
-    """Repräsentiert ein Abteilungskonto mit Saldo und Transaktionen."""
+class Account:
+    """Represents a department account with balance and transactions."""
 
-    def __init__(self, abteilung: str, saldo: float = 0.0, transaktionen=None):
-        self.abteilung = abteilung
-        self.saldo = saldo
-        self.transaktionen = transaktionen if transaktionen else []
+    def __init__(self, department: str, balance: float = 0.0, transactions=None):
+        self.department = department
+        self.balance = balance
+        self.transactions = transactions if transactions else []
 
     def to_dict(self) -> Dict:
-        """Gibt das Konto als Dictionary zurück."""
+        """Returns the account as a dictionary."""
         return {
-            "saldo": self.saldo,
-            "transaktionen": self.transaktionen
+            "balance": self.balance,
+            "transactions": self.transactions
         }
 
     def __repr__(self):
-        return f"Konto(abteilung={self.abteilung}, saldo={self.saldo}, transaktionen={len(self.transaktionen)})"
+        return f"Account(department={self.department}, balance={self.balance}, transactions={len(self.transactions)})"
 
 
-class Transaktion:
-    """Repräsentiert eine Transaktion für ein Konto."""
+class Transaction:
+    """Represents a transaction for an account."""
 
-    def __init__(self, konto: str, typ: str, betrag: float, quelle: str, notiz: str = "", zielkonto: str = None):
-        self.konto = konto
-        self.typ = typ
-        self.betrag = betrag
-        self.quelle = quelle
-        self.notiz = notiz
-        self.zielkonto = zielkonto
-        self.datum = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def __init__(self, account: str, type: str, amount: float, source: str, note: str = "", target_account: str = None):
+        self.account = account
+        self.type = type
+        self.amount = amount
+        self.source = source
+        self.note = note
+        self.target_account = target_account
+        self.date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def to_dict(self) -> Dict:
-        """Gibt die Transaktion als Dictionary zurück."""
+        """Returns the transaction as a dictionary."""
         return {
-            "datum": self.datum,
-            "konto": self.konto,
-            "typ": self.typ,
-            "betrag": self.betrag,
-            "quelle": self.quelle,
-            "notiz": self.notiz,
-            "zielkonto": self.zielkonto,
+            "date": self.date,
+            "account": self.account,
+            "type": self.type,
+            "amount": self.amount,
+            "source": self.source,
+            "note": self.note,
+            "target_account": self.target_account,
         }
 
     def __repr__(self):
-        return f"Transaktion({self.typ}, {self.betrag}€, {self.konto} -> {self.zielkonto if self.zielkonto else '-'})"
+        return f"Transaction({self.type}, {self.amount}€, {self.account} -> {self.target_account if self.target_account else '-'})"
 
 
 class AccountManager:
-    """Verwaltet Konten und Transaktionen über die JSON-Datei."""
+    """Manages accounts and transactions via the JSON file."""
 
     JSON_FILE = os.path.join(os.path.dirname(__file__), "data.json")
 
@@ -59,187 +59,145 @@ class AccountManager:
         self.data = self.load_data()
 
     def load_data(self):
-        """Lädt die Konten und Transaktionen aus der JSON-Datei."""
-        print("[DEBUG] Lade Daten aus JSON...")
+        """Loads accounts and transactions from the JSON file."""
+        print("[DEBUG] Loading data from JSON...")
         try:
             with open(AccountManager.JSON_FILE, "r", encoding="utf-8") as file:
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
-            print("[DEBUG] Fehler: JSON-Datei nicht gefunden oder ungültig. Neue Datei wird erstellt.")
-            return {"konten": {}, "users": {}}
+            print("[DEBUG] Error: JSON file not found or invalid. Creating a new file.")
+            return {"accounts": {}, "users": {}}
 
     def save_data(self):
-        """Speichert die Daten in die JSON-Datei."""
-        print("[DEBUG] Speichere Daten in JSON...")
+        """Saves data to the JSON file."""
+        print("[DEBUG] Saving data to JSON...")
         with open(AccountManager.JSON_FILE, "w", encoding="utf-8") as file:
             json.dump(self.data, file, indent=4, ensure_ascii=False)
 
     def create_account(self, name: str) -> Dict:
-        """Erstellt ein neues Abteilungskonto."""
-        print(f"[DEBUG] Erstelle Konto: {name}")
+        """Creates a new department account."""
+        print(f"[DEBUG] Creating account: {name}")
 
-        if name in self.data["konten"]:
-            return {"error": f"Konto '{name}' existiert bereits."}
+        if name in self.data["accounts"]:
+            return {"error": f"Account '{name}' already exists."}
 
-        self.data["konten"][name] = {"saldo": 0, "transaktionen": []}
+        self.data["accounts"][name] = {"balance": 0, "transactions": []}
         self.save_data()
-        return {"success": f"Konto '{name}' erfolgreich erstellt."}
+        return {"success": f"Account '{name}' successfully created."}
 
     def delete_account(self, name: str) -> Dict:
-        """Löscht ein Konto, wenn der Saldo null ist."""
-        print(f"[DEBUG] Lösche Konto: {name}")
+        """Deletes an account if the balance is zero."""
+        print(f"[DEBUG] Deleting account: {name}")
 
-        if name not in self.data["konten"]:
-            return {"error": f"Konto '{name}' existiert nicht."}
+        if name not in self.data["accounts"]:
+            return {"error": f"Account '{name}' does not exist."}
 
-        if self.data["konten"][name]["saldo"] > 0:
-            return {"error": f"Konto '{name}' hat noch Guthaben und kann nicht gelöscht werden."}
+        if self.data["accounts"][name]["balance"] > 0:
+            return {"error": f"Account '{name}' still has funds and cannot be deleted."}
 
-        del self.data["konten"][name]
+        del self.data["accounts"][name]
         self.save_data()
-        return {"success": f"Konto '{name}' erfolgreich gelöscht."}
+        return {"success": f"Account '{name}' successfully deleted."}
 
-    def deposit(self, name: str, amount: float, quelle: str, notiz: str = "") -> Dict:
-        """Zahlt Geld auf ein Konto ein."""
-        print(f"[DEBUG] Einzahlung: {amount}€ auf '{name}'")
+    def deposit(self, name: str, amount: float, source: str, note: str = "") -> Dict:
+        """Deposits money into an account."""
+        print(f"[DEBUG] Deposit: {amount}€ into '{name}'")
 
-        if name not in self.data["konten"]:
-            return {"error": f"Konto '{name}' existiert nicht."}
+        if name not in self.data["accounts"]:
+            return {"error": f"Account '{name}' does not exist."}
         
         if amount <= 0:
-            return {"error": "Betrag muss positiv sein."}
+            return {"error": "Amount must be positive."}
 
-        self.data["konten"][name]["saldo"] += amount
-        transaction = Transaktion(name, "Einzahlung", amount, quelle, notiz).to_dict()
-        self.data["konten"][name]["transaktionen"].append(transaction)
+        self.data["accounts"][name]["balance"] += amount
+        transaction = Transaction(name, "Deposit", amount, source, note).to_dict()
+        self.data["accounts"][name]["transactions"].append(transaction)
         self.save_data()
-        return {"success": f"{amount}€ auf '{name}' eingezahlt.", "transaction": transaction}
+        return {"success": f"{amount}€ deposited into '{name}'.", "transaction": transaction}
 
-    def withdraw(self, name: str, amount: float, notiz: str = "") -> Dict:
-        """Hebt Geld von einem Konto ab."""
-        print(f"[DEBUG] Auszahlung: {amount}€ von '{name}'")
+    def withdraw(self, name: str, amount: float, note: str = "") -> Dict:
+        """Withdraws money from an account."""
+        print(f"[DEBUG] Withdrawal: {amount}€ from '{name}'")
 
-        if name not in self.data["konten"]:
-            return {"error": f"Konto '{name}' existiert nicht."}
+        if name not in self.data["accounts"]:
+            return {"error": f"Account '{name}' does not exist."}
 
         if amount <= 0:
-            return {"error": "Betrag muss positiv sein."}
+            return {"error": "Amount must be positive."}
 
-        if self.data["konten"][name]["saldo"] < amount:
-            return {"error": "Nicht genügend Guthaben."}
+        if self.data["accounts"][name]["balance"] < amount:
+            return {"error": "Insufficient funds."}
 
-        self.data["konten"][name]["saldo"] -= amount
-        transaction = Transaktion(name, "Auszahlung", amount, "Konto", notiz).to_dict()
-        self.data["konten"][name]["transaktionen"].append(transaction)
+        self.data["accounts"][name]["balance"] -= amount
+        transaction = Transaction(name, "Withdrawal", amount, "Account", note).to_dict()
+        self.data["accounts"][name]["transactions"].append(transaction)
         self.save_data()
-        return {"success": f"{amount}€ von '{name}' ausgezahlt.", "transaction": transaction}
+        return {"success": f"{amount}€ withdrawn from '{name}'.", "transaction": transaction}
 
     def get_transaction_history(self, name: str) -> List[Dict]:
-        """Gibt die Transaktionshistorie eines Kontos zurück."""
-        print(f"[DEBUG] Lade Transaktionshistorie für Konto: {name}")
+        """Returns the transaction history of an account."""
+        print(f"[DEBUG] Loading transaction history for account: {name}")
 
-        if name not in self.data["konten"]:
-            return {"error": f"Konto '{name}' existiert nicht."}
+        if name not in self.data["accounts"]:
+            return {"error": f"Account '{name}' does not exist."}
 
-        return self.data["konten"][name]["transaktionen"]
+        return self.data["accounts"][name]["transactions"]
 
-    def transfer(self, from_account: str, to_account: str, amount: float, notiz: str = "") -> Dict:
-        """Überweist Geld zwischen zwei Konten."""
-        print(f"[DEBUG] Überweisung: {amount}€ von '{from_account}' nach '{to_account}'")
+    def transfer(self, from_account: str, to_account: str, amount: float, note: str = "") -> Dict:
+        """Transfers money between two accounts."""
+        print(f"[DEBUG] Transfer: {amount}€ from '{from_account}' to '{to_account}'")
 
-        if from_account not in self.data["konten"] or to_account not in self.data["konten"]:
-            return {"error": "Eines der Konten existiert nicht."}
+        if from_account not in self.data["accounts"] or to_account not in self.data["accounts"]:
+            return {"error": "One of the accounts does not exist."}
 
         if amount <= 0:
-            return {"error": "Betrag muss positiv sein."}
+            return {"error": "Amount must be positive."}
 
-        if self.data["konten"][from_account]["saldo"] < amount:
-            return {"error": "Nicht genügend Guthaben für die Überweisung."}
+        if self.data["accounts"][from_account]["balance"] < amount:
+            return {"error": "Insufficient funds for transfer."}
 
-        self.data["konten"][from_account]["saldo"] -= amount
-        self.data["konten"][to_account]["saldo"] += amount
-        transaction = Transaktion(from_account, "Umbuchung", amount, "Intern", notiz, to_account).to_dict()
-        self.data["konten"][from_account]["transaktionen"].append(transaction)
-        self.data["konten"][to_account]["transaktionen"].append(transaction)
+        self.data["accounts"][from_account]["balance"] -= amount
+        self.data["accounts"][to_account]["balance"] += amount
+        transaction = Transaction(from_account, "Transfer", amount, "Internal", note, to_account).to_dict()
+        self.data["accounts"][from_account]["transactions"].append(transaction)
+        self.data["accounts"][to_account]["transactions"].append(transaction)
         self.save_data()
-        return {"success": f"{amount}€ von '{from_account}' auf '{to_account}' überwiesen.", "transaction": transaction}
+        return {"success": f"{amount}€ transferred from '{from_account}' to '{to_account}'.", "transaction": transaction}
 
     def export_account_to_txt(self, name: str):
-        """Speichert ein Konto mit Kontostand und Transaktionen in eine .txt-Datei."""
-        print(f"[DEBUG] Exportiere Konto '{name}' nach .txt")
+        """Saves an account with its balance and transactions to a .txt file."""
+        print(f"[DEBUG] Exporting account '{name}' to .txt")
 
-        if name not in self.data["konten"]:
-            print(f"[ERROR] Konto '{name}' existiert nicht.")
+        if name not in self.data["accounts"]:
+            print(f"[ERROR] Account '{name}' does not exist.")
             return
 
-        konto = self.data["konten"][name]
-        filename = f"{name}_konto.txt"
+        account = self.data["accounts"][name]
+        filename = f"{name}_account.txt"
 
         with open(filename, "w", encoding="utf-8") as file:
-            file.write(f"Konto: {name}\n")
-            file.write(f"Aktueller Kontostand: {konto['saldo']}€\n")
-            file.write("\n--- Transaktionen ---\n")
-            for t in konto["transaktionen"]:
-                file.write(f"{t['datum']} | {t['typ']}: {t['betrag']}€ | Quelle: {t['quelle']} | Notiz: {t['notiz']} | Ziel: {t['zielkonto'] if t['zielkonto'] else '-'}\n")
+            file.write(f"Account: {name}\n")
+            file.write(f"Current Balance: {account['balance']}€\n")
+            file.write("\n--- Transactions ---\n")
+            for t in account["transactions"]:
+                file.write(f"{t['date']} | {t['type']}: {t['amount']}€ | Source: {t['source']} | Note: {t['note']} | Target: {t['target_account'] if t['target_account'] else '-'}\n")
 
-        print(f"[DEBUG] Konto '{name}' wurde in '{filename}' gespeichert.")
+        print(f"[DEBUG] Account '{name}' was saved in '{filename}'.")
 
     def get_all_accounts_summary(self):
-        """Gibt eine Liste aller Vereinskonten mit aktuellem Kassenstand und die Gesamtsumme aller Konten aus."""
-        print("[DEBUG] Erstelle Übersicht aller Vereinskonten...")
+        """Returns a list of all accounts with their current balances and the total sum of all accounts."""
+        print("[DEBUG] Creating summary of all accounts...")
 
-        if not self.data["konten"]:
-            print("[ERROR] Keine Konten gefunden.")
-            return {"error": "Keine Konten vorhanden."}
+        if not self.data["accounts"]:
+            print("[ERROR] No accounts found.")
+            return {"error": "No accounts available."}
 
-        total_sum = 0
-        konten_list = []
+        total_sum = sum(account["balance"] for account in self.data["accounts"].values())
+        accounts_list = [f"{name}: {account['balance']}€" for name, account in self.data["accounts"].items()]
 
-        for name, konto in self.data["konten"].items():
-            saldo = konto["saldo"]
-            total_sum += saldo
-            konten_list.append(f"{name}: {saldo}€")
-
-        print(f"[DEBUG] Gesamtsumme aller Konten: {total_sum}€")
+        print(f"[DEBUG] Total balance of all accounts: {total_sum}€")
 
         return {
-            "konten": konten_list,
-            "gesamt_summe": total_sum
+            "accounts": accounts_list,
+            "total_balance": total_sum
         }
-
-
-def main():
-    manager = AccountManager()
-
-    print("\n### Konto erstellen ###")
-    print(manager.create_account("Tanzen"))  # Erfolgreich
-    print(manager.create_account("Tanzen"))  # Fehler: Konto existiert bereits
-
-    print("\n### Geld einzahlen ###")
-    print(manager.deposit("Tanzen", 200, "Mitgliedsbeitrag"))  # Erfolgreich
-    print(manager.deposit("NichtVorhanden", 100, "Spende"))  # Fehler: Konto existiert nicht
-    print(manager.deposit("Tanzen", -50, "Spende"))  # Fehler: Betrag negativ
-
-    print("\n### Geld auszahlen ###")
-    print(manager.withdraw("Tanzen", 50, "Trikots"))  # Erfolgreich
-    print(manager.withdraw("Tanzen", 500, "Miete"))  # Fehler: Nicht genügend Guthaben
-    print(manager.withdraw("NichtVorhanden", 10, "Test"))  # Fehler: Konto existiert nicht
-
-    print("\n### Konto-Export testen ###")
-    manager.export_account_to_txt("Tanzen")  # Erfolgreich
-    manager.export_account_to_txt("NichtVorhanden")  # Fehler: Konto existiert nicht
-
-    print("\n### Übersicht aller Konten ###")
-    summary = manager.get_all_accounts_summary()
-    print("\n".join(summary["konten"]))
-    print(f"Gesamtsumme aller Konten: {summary['gesamt_summe']}€")
-
-    print("\n### Konto löschen ###")
-    print(manager.create_account("Testkonto"))
-    print(manager.delete_account("Testkonto"))  # Erfolgreich
-    print(manager.delete_account("Tanzen"))  # Fehler: Konto hat noch Guthaben
-
-
-if __name__ == "__main__":
-    main()
-
