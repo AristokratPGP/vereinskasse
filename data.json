@@ -1,8 +1,8 @@
 {
-    "konten": {
+    "accounts": {
         "Tanzen": {
-            "saldo": 150,
-            "transaktionen": [
+            "balance": 150,
+            "transactions": [
                 {
                     "datum": "2025-01-31 09:48:17",
                     "konto": "Tanzen",
@@ -19,6 +19,61 @@
                     "betrag": 50,
                     "quelle": "Konto",
                     "notiz": "Trikots",
+                    "zielkonto": null
+                },
+                {
+                    "datum": "2025-01-30 01:48:17",
+                    "konto": "Tanzen",
+                    "typ": "Auszahlung",
+                    "betrag": 53,
+                    "quelle": "Konto",
+                    "notiz": "Ball",
+                    "zielkonto": null
+                }
+            ]
+        },
+        "Fußball": {
+            "balance": 500,
+            "transactions": [
+                {
+                    "datum": "2025-01-30 14:12:05",
+                    "konto": "Fußball",
+                    "typ": "Einzahlung",
+                    "betrag": 300,
+                    "quelle": "Sponsoring",
+                    "notiz": "Firma X",
+                    "zielkonto": null
+                },
+                {
+                    "datum": "2025-01-29 18:30:42",
+                    "konto": "Fußball",
+                    "typ": "Auszahlung",
+                    "betrag": 100,
+                    "quelle": "Konto",
+                    "notiz": "Trainingsmaterial",
+                    "zielkonto": null
+                }
+            ]
+        },
+        "Schach": {
+            "balance": 250,
+            "transactions": [
+                {
+                    "datum": "2025-01-28 16:20:00",
+                    "konto": "Schach",
+                    "typ": "Einzahlung",
+                    "betrag": 150,
+                    "quelle": "Turniereinnahmen",
+                    "notiz": "",
+                    "zielkonto": null
+                },
+                {
+                    "datum": "2025-01-27 10:05:33",
+                    "konto": "Schach",
+                    "typ": "Auszahlung",
+                    "betrag": 50,
+                    "quelle": "Konto",
+                    "notiz": "Schachbretter",
                     "zielkonto": null
                 }
             ]

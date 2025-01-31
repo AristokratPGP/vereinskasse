@@ -58,6 +58,12 @@ class AccountManager:
     def __init__(self):
         self.data = self.load_data()
 
+        if "accounts" not in self.data or not isinstance(self.data["accounts"], dict):
+            print("[DEBUG] Fehler: `accounts` fehlt oder ist ungültig. Initialisiere es neu.")
+            self.data["accounts"] = {}
+
+        print("[DEBUG] self.data nach Laden:", self.data)
+
     def load_data(self):
         """Loads accounts and transactions from the JSON file."""
         print("[DEBUG] Loading data from JSON...")
@@ -185,17 +191,21 @@ class AccountManager:
         print(f"[DEBUG] Account '{name}' was saved in '{filename}'.")
 
     def get_all_accounts_summary(self):
-        """Returns a list of all accounts with their current balances and the total sum of all accounts."""
-        print("[DEBUG] Creating summary of all accounts...")
+        """Gibt eine Liste aller Konten mit Saldo und Gesamtsumme zurück."""
+        print("[DEBUG] Erstelle Konto-Übersicht...")
 
-        if not self.data["accounts"]:
-            print("[ERROR] No accounts found.")
+        if "accounts" not in self.data or not isinstance(self.data["accounts"], dict):
+            print("[ERROR] `accounts` fehlt oder ist ungültig.")
+            return {"error": "No accounts available."}
+
+        if not self.data["accounts"]:  # Falls die Accounts-Liste leer ist
+            print("[ERROR] Keine Konten vorhanden.")
             return {"error": "No accounts available."}
 
         total_sum = sum(account["balance"] for account in self.data["accounts"].values())
         accounts_list = [f"{name}: {account['balance']}€" for name, account in self.data["accounts"].items()]
 
-        print(f"[DEBUG] Total balance of all accounts: {total_sum}€")
+        print(f"[DEBUG] Gesamtguthaben: {total_sum}€")
 
         return {
             "accounts": accounts_list,
