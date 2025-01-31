@@ -19,7 +19,8 @@ class User:
             "accounts": self.accounts
         }
 
-
+    def __repr__(self):
+            return f"User(username='{self.username}', role='{self.role}', accounts={self.accounts})"
 
 class UserManager:
     JSON_FILE = os.path.join(os.path.dirname(__file__), "data.json")
@@ -55,12 +56,12 @@ class UserManager:
         users = {
             username: User(
                 username,
-                data.get("passwort", ""),  # Leeres Passwort als Fallback
-                data.get("rolle", "Finance-Referent"),  # Standard-Rolle setzen
-                data.get("konten", [])  # Falls keine Konten vorhanden sind
+                data.get("password", ""),  # Leeres Passwort als Fallback
+                data.get("role", "Finance-Referent"),  # Standard-Rolle setzen
+                data.get("accounts", [])  # Falls keine Konten vorhanden sind
             )
-    for username, data in users_dict.items()
-}
+        for username, data in users_dict.items()
+        }
         print(f" Loaded users: {users}")
         return users
 
