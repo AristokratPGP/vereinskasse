@@ -6,7 +6,7 @@ import sys
 from user_manager import UserManager
 from finanzen_gui import FinanzenDashboard
 from kassenwart_gui import KassenwartDashboard
-
+from admin_gui import AdminDashboard
 # Betriebssystem prüfen
 IS_WINDOWS = sys.platform.startswith("win")
 
@@ -61,11 +61,10 @@ def login():
         messagebox.showerror("Login Fehlgeschlagen", "Falscher Benutzername oder Passwort!")
 
 def open_admin_gui():
-    """Öffnet die Administrator-GUI in einem neuen Fenster."""
-    admin_window = tk.Toplevel(root)
-    admin_window.title("Administrator - Vereinskassen-System")
-    tk.Label(admin_window, text="Willkommen in der Admin-GUI!", font=("Arial", 14)).pack(pady=20)
-    tk.Button(admin_window, text="Zurück", command=lambda: go_back_to_login(admin_window)).pack(pady=20)
+    """Öffnet die Administrator-GUI mit dem richtigen AdminDashboard."""
+    root.withdraw()  # **Versteckt das Login-Fenster**
+    admin_window = tk.Toplevel(root)  # Neues Fenster für das Admin-Dashboard
+    AdminDashboard(admin_window)
 
 def open_kassenwart_gui(username):
     """Öffnet die Kassenwart-GUI mit dem richtigen Dashboard."""

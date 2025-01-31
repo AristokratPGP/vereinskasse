@@ -148,8 +148,8 @@
             ]
         },
         "Admin": {
-            "password": "",
-            "role": "Finance-Referent",
+            "password": "admin",
+            "role": "Administrator",
             "accounts": []
         },
         "Max": {
