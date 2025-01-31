@@ -18,6 +18,9 @@ class User:
             "role": self.role,
             "accounts": self.accounts
         }
+    
+    def __repr__(self):
+        return f"User(username='{self.username}', role='{self.role}', accounts={self.accounts})"
 
 
 
@@ -55,9 +58,9 @@ class UserManager:
         users = {
             username: User(
                 username,
-                data.get("passwort", ""),  # Leeres Passwort als Fallback
-                data.get("rolle", "Finance-Referent"),  # Standard-Rolle setzen
-                data.get("konten", [])  # Falls keine Konten vorhanden sind
+                data.get("password", ""),  # Leeres Passwort als Fallback
+                data.get("role", "Finance-Referent"),  # Standard-Rolle setzen
+                data.get("accounts", [])  # Falls keine Konten vorhanden sind
             )
     for username, data in users_dict.items()
 }
