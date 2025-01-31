@@ -104,11 +104,6 @@
             "password": "",
             "role": "Finance-Referent",
             "accounts": []
-        },
-        "Tom": {
-            "password": "tom789",
-            "role": "Administrator",
-            "accounts": []
         }
     }
 }

@@ -9,9 +9,6 @@ class User:
         self.role = role
         self.accounts = accounts if accounts is not None else []  # No accounts means access to all
 
-    def has_access_to(self, account_name):
-        """Checks if the user has access to a specific account."""
-        return self.role != "Treasurer" or not self.accounts or account_name in self.accounts
 
     def to_dict(self):
         """Converts the User object into a dictionary."""
@@ -21,9 +18,6 @@ class User:
             "accounts": self.accounts
         }
 
-    def __repr__(self):
-        accounts_text = "All accounts" if not self.accounts and self.role == "Treasurer" else ", ".join(self.accounts)
-        return f"User(username={self.username}, role={self.role}, accounts={accounts_text})"
 
 
 class UserManager:
