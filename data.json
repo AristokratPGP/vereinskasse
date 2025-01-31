@@ -1,27 +1,25 @@
 {
     "konten": {
         "Tanzen": {
-            "saldo": 500,
+            "saldo": 150,
             "transaktionen": [
                 {
-                    "datum": "2025-01-01",
-                    "typ": "einzahlung",
-                    "betrag": 100
+                    "datum": "2025-01-31 09:48:17",
+                    "konto": "Tanzen",
+                    "typ": "Einzahlung",
+                    "betrag": 200,
+                    "quelle": "Mitgliedsbeitrag",
+                    "notiz": "",
+                    "zielkonto": null
                 },
                 {
-                    "datum": "2025-01-15",
-                    "typ": "auszahlung",
-                    "betrag": 50
-                }
-            ]
-        },
-        "Basketball": {
-            "saldo": 300,
-            "transaktionen": [
-                {
-                    "datum": "2025-01-10",
-                    "typ": "einzahlung",
-                    "betrag": 200
+                    "datum": "2025-01-31 09:48:17",
+                    "konto": "Tanzen",
+                    "typ": "Auszahlung",
+                    "betrag": 50,
+                    "quelle": "Konto",
+                    "notiz": "Trikots",
+                    "zielkonto": null
                 }
             ]
         }
