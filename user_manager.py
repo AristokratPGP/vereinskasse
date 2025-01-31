@@ -55,9 +55,9 @@ class UserManager:
         print("[DEBUG] Loading users...")
         users_dict = self.data.get("users", {})
         users = {
-            username: User(username, data["password"], data["role"], data["accounts"])
-            for username, data in users_dict.items()
-        }
+            username: User(username, data["passwort"], data["rolle"], data["konten"])
+                for username, data in users_dict.items()
+            }
         print(f"[DEBUG] Loaded users: {users}")
         return users
 

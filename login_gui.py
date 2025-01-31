@@ -4,6 +4,7 @@ import subprocess
 import os
 import sys
 import json
+from user_manager import UserManager
 
 # Betriebssystem prüfen
 IS_WINDOWS = sys.platform.startswith("win")
@@ -13,34 +14,20 @@ ADMIN_GUI_PATH = os.path.join(BASE_DIR, "admin_gui.py")
 KASSENWART_GUI_PATH = os.path.join(BASE_DIR, "kassenwart_gui.py")
 FINANZEN_GUI_PATH = os.path.join(BASE_DIR, "finanzen_gui.py")
 
-# JSON-Datei laden
-JSON_FILE = os.path.join(os.path.dirname(__file__), "data.json")
-
-def load_users():
-    """Lädt die Benutzer aus der JSON-Datei in ein Dictionary."""
-    try:
-        with open(JSON_FILE, "r", encoding="utf-8") as file:
-            data = json.load(file)
-
-        # Falls "users" nicht existiert oder leer ist, gebe ein leeres Dictionary zurück
-        users = data.get("users", {})
-        print("[DEBUG] Geladene Benutzer:", users)  # Debugging-Ausgabe
-        return users
-
-    except (FileNotFoundError, json.JSONDecodeError):
-        print("[DEBUG] Fehler: JSON-Datei nicht gefunden oder ungültig.")
-        return {}
 
 # Login-Funktion
 def login():
     username = entry_username.get().strip()
     password = entry_password.get().strip()
+    manager = UserManager()
+    users_dict = manager.load_users()  # Lade die Benutzer aus JSON
 
     if not username or not password:
         messagebox.showerror("Fehler", "Benutzername und Passwort eingeben!")
         return
 
-    users_dict = load_users()  # Lade die Benutzer aus JSON
+
+   
 
     print(f"[DEBUG] Benutzername eingeben: {username}")
     print(f"[DEBUG] Passwort eingeben: {password}")
@@ -48,11 +35,11 @@ def login():
     # Prüfen, ob Benutzer existiert und Passwort übereinstimmt
     if username in users_dict:
         print(f"[DEBUG] Gefundener Benutzer: {users_dict[username]}")  # Debugging-Ausgabe
-        print(f"[DEBUG] Erwartetes Passwort: {users_dict[username]['passwort']}")  # Erwartetes Passwort aus JSON
+        print(f"[DEBUG] Erwartetes Passwort: {users_dict[username].password}")  # Erwartetes Passwort aus JSON
 
-        if users_dict[username]["passwort"] == password:
-            role = users_dict[username]["rolle"]
-            konten = users_dict[username]["konten"]
+        if users_dict[username].password == password:
+            role = users_dict[username].role
+            konten = users_dict[username].accounts
 
             message = f"Willkommen, {username}!\nRolle: {role}"
             if konten:
